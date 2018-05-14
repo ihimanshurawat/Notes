@@ -16,7 +16,10 @@ import com.himanshurawat.notes.R
 import com.himanshurawat.notes.db.entity.NoteEntity
 import com.himanshurawat.notes.utils.Constant
 import kotlinx.android.synthetic.main.activity_add_note.*
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.noButton
 import org.jetbrains.anko.toast
+import org.jetbrains.anko.yesButton
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -107,9 +110,17 @@ class AddNote : AppCompatActivity() {
                 }
             }
             R.id.delete ->{
-                viewModel.deleteNote(noteEntity)
-                toast("Deleting")
-                finish()
+
+                alert("Sure you want to Delete?") {
+                    title = "Delete Note"
+                    yesButton {
+                        viewModel.deleteNote(noteEntity)
+                        toast("Deleting")
+                        finish()
+                    }
+                    noButton {  }
+                }.show()
+
             }
         }
         return super.onOptionsItemSelected(item)
