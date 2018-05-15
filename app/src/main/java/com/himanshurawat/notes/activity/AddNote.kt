@@ -29,38 +29,43 @@ class AddNote : AppCompatActivity() {
     private lateinit var viewModel: NoteViewModel
     private lateinit var noteIntent: Intent
     private lateinit var noteEntity: NoteEntity
+    private var noteId: Long = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_note)
+
+        //Setting Title and Enabling Home Up
         val ab: ActionBar? = supportActionBar
         ab?.title = ""
         ab?.setHomeButtonEnabled(true)
 
+        //Intent
         noteIntent = intent
+        //View Model
         viewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
 
+        //Check Whether its Editing or New Note
         if(intent.hasExtra(Constant.GET_NOTES)){
-            viewModel.getNoteById(intent.
-                    getLongExtra(Constant.GET_NOTES,-1)).
-                    observe(this, Observer { note ->
+            noteId = intent.getLongExtra(Constant.GET_NOTES,-1)
+
+            viewModel.getNoteById(noteId).observe(this, Observer { note ->
+
                         titleEditText.setText(note?.title)
                         descriptionEditText.setText(note?.description)
+
                         if(note != null){
+                            //Note Object
                             noteEntity = note
                         }
 
                     })
-            viewModel.updateCount(intent.getLongExtra(Constant.GET_NOTES,-1))
+            viewModel.updateCount(noteId)
         }else{
-            titleEditText.requestFocus()
-            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE)
-                    as InputMethodManager
-            inputMethodManager.showSoftInput(titleEditText,InputMethodManager.SHOW_IMPLICIT)
+
         }
 
     }
-
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -74,43 +79,44 @@ class AddNote : AppCompatActivity() {
 
         when(item.itemId){
             R.id.save ->{
-                if(titleEditText.text.toString() == "" && descriptionEditText.text.toString() != ""){
-                    val note = NoteEntity(intent.getLongExtra(Constant.GET_NOTES,0),
-                            descriptionEditText.text.trim()[0].toString(),
-                            descriptionEditText.text.trim().toString(),
-                            getDateTime(),
-                            0)
+                val title = titleEditText.text.trim().toString()
+                val description = descriptionEditText.text.trim().toString()
+
+                if(title == "" && description != ""){
+                    //NoteEntity Object
+                    val note = NoteEntity(noteId,description[0].toString(),
+                            description, getDateTime(), 0)
+
                     viewModel.addNote(note)
                     finish()
                     return true
-                }else if(titleEditText.text.toString() != "" || descriptionEditText.text.toString() != "") {
-                    val note = NoteEntity(intent.getLongExtra(Constant.GET_NOTES,0),
-                            titleEditText.text.trim().toString(),
-                            descriptionEditText.text.trim().toString(),
-                            getDateTime(),
-                            0
-                    )
+
+                }else if(title != "" || description != "") {
+
+                    val note = NoteEntity(noteId,title,
+                            description, getDateTime(), 0)
+
                     viewModel.addNote(note)
                     finish()
                     return true
-                }else if(titleEditText.text.toString() != "" && descriptionEditText.text.toString() == ""){
-                    val note = NoteEntity(intent.getLongExtra(Constant.GET_NOTES,0),
-                            titleEditText.text.trim().toString(),
-                            "",
-                            getDateTime(),
-                            0
-                    )
+                }else
+                    if(title != "" && description == ""){
+
+                    val note = NoteEntity(noteId, title,
+                            "", getDateTime(),0)
+
                     viewModel.addNote(note)
                     finish()
                     return true
-                }
+
+                    }
 
                 else{
-                    toast("Add Something to Note Down")
+                        toast("Add Something to Note Down")
                 }
             }
             R.id.delete ->{
-
+                //Alert Before Delete Using Anko
                 alert("Sure you want to Delete?") {
                     title = "Delete Note"
                     yesButton {
@@ -126,7 +132,7 @@ class AddNote : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-
+    //Hide Delete From Menu If It's New Note
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         super.onPrepareOptionsMenu(menu)
         if(!intent.hasExtra(Constant.GET_NOTES)){
@@ -135,9 +141,10 @@ class AddNote : AppCompatActivity() {
         return true
     }
 
+    //Returns Time String
     private fun getDateTime():String {
         val now = Date()
-        val dateFormatter = SimpleDateFormat("EEEE, d-M-y 'at' h:m a")
+        val dateFormatter = SimpleDateFormat("EE, d-M-y 'at' h:m a")
         return dateFormatter.format(now)
 
     }

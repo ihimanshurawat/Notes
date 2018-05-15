@@ -69,7 +69,6 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
 
     }
 
-
     override fun onNoteSelected(noteId: Long) {
         val intent = Intent(this,AddNote::class.java)
         intent.putExtra(Constant.GET_NOTES,noteId)
