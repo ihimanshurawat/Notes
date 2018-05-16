@@ -39,6 +39,7 @@ class AddNote : AppCompatActivity() {
         if (it != null) {
             addNoteViewModel.setTitle(it.title)
             addNoteViewModel.setDescription(it.description)
+            noteEntity = it
         }
     }
 
