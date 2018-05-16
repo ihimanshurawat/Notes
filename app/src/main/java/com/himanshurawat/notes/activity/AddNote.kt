@@ -7,6 +7,7 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.ActionBar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -15,6 +16,7 @@ import com.himanshurawat.notes.viewmodel.NoteViewModel
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.db.entity.NoteEntity
 import com.himanshurawat.notes.utils.Constant
+import com.himanshurawat.notes.viewmodel.AddNoteViewModel
 import kotlinx.android.synthetic.main.activity_add_note.*
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
@@ -30,6 +32,17 @@ class AddNote : AppCompatActivity() {
     private lateinit var noteIntent: Intent
     private lateinit var noteEntity: NoteEntity
     private var noteId: Long = -1
+    private lateinit var title: String
+    private lateinit var description: String
+
+    private val observer:Observer<NoteEntity?> = Observer {
+        if (it != null) {
+            addNoteViewModel.setTitle(it.title)
+            addNoteViewModel.setDescription(it.description)
+        }
+    }
+
+    private lateinit var addNoteViewModel: AddNoteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,27 +57,25 @@ class AddNote : AppCompatActivity() {
         noteIntent = intent
         //View Model
         viewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
+        addNoteViewModel = ViewModelProviders.of(this).get(AddNoteViewModel::class.java)
+        noteId = noteIntent.getLongExtra(Constant.GET_NOTES,0)
 
-        //Check Whether its Editing or New Note
-        if(intent.hasExtra(Constant.GET_NOTES)){
-            noteId = intent.getLongExtra(Constant.GET_NOTES,-1)
-
-            viewModel.getNoteById(noteId).observe(this, Observer { note ->
-
-                        titleEditText.setText(note?.title)
-                        descriptionEditText.setText(note?.description)
-
-                        if(note != null){
-                            //Note Object
-                            noteEntity = note
-                        }
-
-                    })
-            viewModel.updateCount(noteId)
-        }else{
-
+        if(!addNoteViewModel.isFilled){
+            if(noteIntent.hasExtra(Constant.GET_NOTES)){
+                Log.i("Note","Inside If Loop")
+                Log.i("Note","Note ID $noteId")
+                val note = viewModel.getNoteById(noteId).observe(this, observer)
+                addNoteViewModel.isFilled = true
+            }
         }
 
+
+        addNoteViewModel.title.observe(this, Observer { text ->
+            titleEditText.setText(text)
+        })
+        addNoteViewModel.description.observe(this, Observer { text ->
+            descriptionEditText.setText(text)
+        })
     }
 
 
@@ -79,8 +90,8 @@ class AddNote : AppCompatActivity() {
 
         when(item.itemId){
             R.id.save ->{
-                val title = titleEditText.text.trim().toString()
-                val description = descriptionEditText.text.trim().toString()
+                title = titleEditText.text.trim().toString()
+                description = descriptionEditText.text.trim().toString()
 
                 if(title == "" && description != ""){
                     //NoteEntity Object
@@ -141,6 +152,19 @@ class AddNote : AppCompatActivity() {
         return true
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        title = titleEditText.text.trim().toString()
+        description = descriptionEditText.text.trim().toString()
+        if(noteIntent.hasExtra(Constant.GET_NOTES)) {
+            viewModel.getNoteById(noteId).removeObserver {observer}
+        }
+
+        addNoteViewModel.setTitle(title)
+        addNoteViewModel.setDescription(description)
+
+    }
+
     //Returns Time String
     private fun getDateTime():String {
         val now = Date()
@@ -148,5 +172,12 @@ class AddNote : AppCompatActivity() {
         return dateFormatter.format(now)
 
     }
+
+
+
+
+
+
+
 
 }
