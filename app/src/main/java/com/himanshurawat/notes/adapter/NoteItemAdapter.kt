@@ -45,9 +45,9 @@ class NoteItemAdapter(var noteList:List<NoteEntity>,var listener: OnItemClickLis
 
 
     class NoteViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
-        var titleText = itemView.findViewById<TextView>(R.id.noteTitle)
-        var descriptionText = itemView.findViewById<TextView>(R.id.noteDescription)
-        var dateText = itemView.findViewById<TextView>(R.id.noteDate)
+        var titleText = itemView.findViewById<TextView>(R.id.note_item_view_title_text_view)
+        var descriptionText = itemView.findViewById<TextView>(R.id.note_item_view_description_text_view)
+        var dateText = itemView.findViewById<TextView>(R.id.note_item_view_date_text_view)
 
         fun bind(noteId: Long,listener:OnItemClickListener){
             itemView.setOnClickListener({

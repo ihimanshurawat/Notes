@@ -8,10 +8,13 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import com.himanshurawat.notes.R.id.*
 import com.himanshurawat.notes.activity.AddNote
+import com.himanshurawat.notes.activity.Search
 import com.himanshurawat.notes.adapter.NoteItemAdapter
 import com.himanshurawat.notes.db.entity.NoteEntity
 import com.himanshurawat.notes.utils.Constant
@@ -41,9 +44,9 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
                 if(it != null) {
                     noteAdapter.addNotes(it)
                     if(noteAdapter.itemCount>0){
-                        poweredByImageView.visibility = View.GONE
+                        content_main_empty_notes_image_view.visibility = View.GONE
                     }else{
-                        poweredByImageView.visibility = View.VISIBLE
+                        content_main_empty_notes_image_view.visibility = View.VISIBLE
                     }
                 }
         })
@@ -65,6 +68,12 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        when(item.itemId){
+
+            R.id.search ->{
+                startActivity(Intent(this@MainActivity, Search::class.java))
+            }
+        }
         return super.onOptionsItemSelected(item)
 
     }
@@ -74,5 +83,6 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
         intent.putExtra(Constant.GET_NOTES,noteId)
         startActivity(intent)
     }
+
 
 }

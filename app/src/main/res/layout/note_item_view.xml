@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="16dp">
+    android:layout_marginBottom="8dp">
 
         <android.support.constraint.ConstraintLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
@@ -17,7 +17,8 @@
             <TextView
                 android:paddingTop="16dp"
                 android:paddingStart="16dp"
-                android:id="@+id/noteTitle"
+                android:paddingEnd="16dp"
+                android:id="@+id/note_item_view_title_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Heading"
@@ -29,7 +30,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/noteDescription"
+                android:id="@+id/note_item_view_description_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
@@ -42,10 +43,10 @@
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/noteTitle" />
+                app:layout_constraintTop_toBottomOf="@+id/note_item_view_title_text_view" />
 
             <TextView
-                android:id="@+id/noteDate"
+                android:id="@+id/note_item_view_date_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -58,7 +59,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/noteDescription" />
+                app:layout_constraintTop_toBottomOf="@+id/note_item_view_description_text_view" />
 
         </android.support.constraint.ConstraintLayout>
 

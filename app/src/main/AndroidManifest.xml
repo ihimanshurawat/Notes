@@ -19,8 +19,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.AddNote"
+        <activity
+            android:name=".activity.AddNote"
             android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".activity.Search"
+            android:label="@string/title_activity_search"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

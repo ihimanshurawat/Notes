@@ -13,9 +13,9 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/noteRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
         <ImageView
-            android:id="@+id/poweredByImageView"
+            android:id="@+id/content_main_empty_notes_image_view"
             android:src="@mipmap/ic_launcher"
             android:visibility="gone"
             android:layout_width="200dp"

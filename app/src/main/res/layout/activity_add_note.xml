@@ -7,7 +7,7 @@
     tools:context=".activity.AddNote">
 
     <EditText
-        android:id="@+id/titleEditText"
+        android:id="@+id/activity_add_note_title_edit_text"
         android:inputType="text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -35,10 +35,10 @@
         android:background="@color/colorAccent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titleEditText" />
+        app:layout_constraintTop_toBottomOf="@+id/activity_add_note_title_edit_text" />
 
     <EditText
-        android:id="@+id/descriptionEditText"
+        android:id="@+id/activity_add_note_description_edit_text"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@android:color/transparent"

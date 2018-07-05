@@ -3,4 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.himanshurawat.notes.MainActivity">
 
+    <item
+        android:id="@+id/search"
+        android:title="Search"
+        app:icon = "@drawable/search_icon"
+        app:showAsAction="always" />
+
+
 </menu>

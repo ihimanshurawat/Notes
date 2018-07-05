@@ -72,10 +72,10 @@ class AddNote : AppCompatActivity() {
 
 
         addNoteViewModel.title.observe(this, Observer { text ->
-            titleEditText.setText(text)
+            activity_add_note_title_edit_text.setText(text)
         })
         addNoteViewModel.description.observe(this, Observer { text ->
-            descriptionEditText.setText(text)
+            activity_add_note_description_edit_text.setText(text)
         })
     }
 
@@ -91,8 +91,8 @@ class AddNote : AppCompatActivity() {
 
         when(item.itemId){
             R.id.save ->{
-                title = titleEditText.text.trim().toString()
-                description = descriptionEditText.text.trim().toString()
+                title = activity_add_note_title_edit_text.text.trim().toString()
+                description = activity_add_note_description_edit_text.text.trim().toString()
 
                 if(title == "" && description != ""){
                     //NoteEntity Object
@@ -155,8 +155,8 @@ class AddNote : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        title = titleEditText.text.trim().toString()
-        description = descriptionEditText.text.trim().toString()
+        title = activity_add_note_title_edit_text.text.trim().toString()
+        description = activity_add_note_description_edit_text.text.trim().toString()
         if(noteIntent.hasExtra(Constant.GET_NOTES)) {
             viewModel.getNoteById(noteId).removeObserver {observer}
         }
