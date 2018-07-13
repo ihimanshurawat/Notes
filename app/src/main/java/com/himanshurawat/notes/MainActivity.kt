@@ -56,6 +56,8 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
                 LinearLayoutManager.VERTICAL,false)
 
 
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -74,14 +76,16 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
                 startActivity(Intent(this@MainActivity, Search::class.java))
             }
         }
-        return super.onOptionsItemSelected(item)
+        return true;
 
     }
 
     override fun onNoteSelected(noteId: Long) {
+
         val intent = Intent(this,AddNote::class.java)
         intent.putExtra(Constant.GET_NOTES,noteId)
         startActivity(intent)
+
     }
 
 

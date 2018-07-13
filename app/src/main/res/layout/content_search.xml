@@ -9,6 +9,7 @@
     tools:showIn="@layout/activity_search">
 
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/content_search_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
