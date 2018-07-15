@@ -67,48 +67,6 @@ class SearchItemAdapter(val context: Context,
 
 
 
-
-
-
-//    override fun getFilter(): Filter {
-//
-//        return object : Filter(){
-//            override fun performFiltering(constraint: CharSequence?): FilterResults {
-//                val charString = constraint.toString()
-//                if(charString.isEmpty()){
-//                    filteredItemList = searchItemList
-//                    searchString = ""
-//                }else {
-//                    val filteredList = ArrayList<NoteEntity>()
-//                    searchString = charString
-//
-//                    for (items in searchItemList) {
-//                        if (items.title.toLowerCase().contains(charString.toLowerCase()) ||
-//                                items.description.toLowerCase().contains(charString.toLowerCase()) ||
-//                                items.date.toLowerCase().contains(charString.toLowerCase())) {
-//                            filteredList.add(items)
-//                        }
-//                    }
-//                    filteredItemList = filteredList
-//                }
-//
-//                val filterResult = FilterResults()
-//                filterResult.values = filteredItemList
-//                return filterResult
-//
-//            }
-//
-//            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-//                if(results != null){
-//                    filteredItemList = results.values as MutableList<NoteEntity>
-//                    notifyDataSetChanged()
-//                }
-//            }
-//
-//        }
-//
-//    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchItemViewHolder {
 
         return SearchItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.note_item_view,parent,false))

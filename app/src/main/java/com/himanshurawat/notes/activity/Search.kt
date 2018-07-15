@@ -18,6 +18,7 @@ import com.himanshurawat.notes.utils.Constant
 
 
 class Search : AppCompatActivity(), SearchView.OnQueryTextListener, SearchItemAdapter.OnSearchItemClickListener {
+
     override fun onItemClick(id: Long) {
         val intent = Intent(Search@this,AddNote::class.java)
         intent.putExtra(Constant.GET_NOTES,id)
@@ -56,15 +57,6 @@ class Search : AppCompatActivity(), SearchView.OnQueryTextListener, SearchItemAd
                 adapter.notifyDataSetChanged()
             }
         })
-
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
-
-
-
 
     }
 
