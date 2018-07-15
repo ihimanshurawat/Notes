@@ -6,4 +6,5 @@
     <color name="colorTitle">#191919</color>
     <color name="colorDescription">#4c4c4c</color>
     <color name="colorDate">#999999</color>
+    <color name="colorBackground">#FAFAFA</color>
 </resources>

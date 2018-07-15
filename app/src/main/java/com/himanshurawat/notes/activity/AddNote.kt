@@ -43,11 +43,13 @@ class AddNote : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_note)
+        setSupportActionBar(activity_add_note_toolbar)
 
         //Setting Title and Enabling Home Up
         val ab: ActionBar? = supportActionBar
         ab?.title = ""
         ab?.setHomeButtonEnabled(true)
+        ab?.setDisplayHomeAsUpEnabled(true)
 
         //Intent
         noteIntent = intent
