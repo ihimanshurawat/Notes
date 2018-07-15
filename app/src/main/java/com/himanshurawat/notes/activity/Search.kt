@@ -1,6 +1,7 @@
 package com.himanshurawat.notes.activity
 
 import android.arch.lifecycle.Observer
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
@@ -11,11 +12,27 @@ import android.view.MenuItem
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.adapter.SearchItemAdapter
 import com.himanshurawat.notes.viewmodel.SearchViewModel
+import kotlinx.android.synthetic.main.activity_add_note.*
 
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.content_search.*
+import android.text.Spannable
+import android.text.style.ImageSpan
+import android.graphics.drawable.Drawable
+import android.support.v4.content.ContextCompat
+import android.text.SpannableString
+import android.view.View
+import com.himanshurawat.notes.utils.Constant
 
-class Search : AppCompatActivity(), SearchView.OnQueryTextListener {
+
+class Search : AppCompatActivity(), SearchView.OnQueryTextListener, SearchItemAdapter.OnSearchItemClickListener {
+    override fun onItemClick(id: Long) {
+        val intent = Intent(Search@this,AddNote::class.java)
+        intent.putExtra(Constant.GET_NOTES,id)
+        startActivity(intent)
+        finish()
+    }
+
 
     lateinit var adapter: SearchItemAdapter
     lateinit var searchViewModel: SearchViewModel
@@ -24,8 +41,14 @@ class Search : AppCompatActivity(), SearchView.OnQueryTextListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
         setSupportActionBar(toolbar)
+        val actionBar = supportActionBar
+        if(actionBar != null) {
+            actionBar.setHomeButtonEnabled(true)
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.title = ""
+        }
 
-        adapter = SearchItemAdapter(arrayListOf())
+        adapter = SearchItemAdapter(this,arrayListOf(),this)
 
         //Setting Up Recycler View
         content_search_recycler_view.adapter = adapter
@@ -50,6 +73,7 @@ class Search : AppCompatActivity(), SearchView.OnQueryTextListener {
 
 
 
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -67,12 +91,6 @@ class Search : AppCompatActivity(), SearchView.OnQueryTextListener {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-
-
-        return true
-    }
-
 
     override fun onQueryTextSubmit(query: String?): Boolean {
 
@@ -83,11 +101,9 @@ class Search : AppCompatActivity(), SearchView.OnQueryTextListener {
         if(newText != null){
             adapter.filterSearch(newText)
         }
-
-
-
         return true
     }
+
 
 
 
