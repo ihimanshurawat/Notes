@@ -28,8 +28,6 @@ class NoteViewModel constructor(application: Application):AndroidViewModel(appli
     //ViewModel Function to Fetch All Data
     fun getNotes(): LiveData<List<NoteEntity>> {
 
-
-        Log.i("Note","ASYNC Add Note Returning")
         return database.getNoteDao().allNotes()
     }
 
@@ -39,7 +37,6 @@ class NoteViewModel constructor(application: Application):AndroidViewModel(appli
         //Using Anko for Async Operations
         doAsync {
             database.getNoteDao().addNote(note)
-            Log.i("Note","ASYNC Add Note")
         }
     }
 

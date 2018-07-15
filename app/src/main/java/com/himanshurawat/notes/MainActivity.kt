@@ -22,6 +22,11 @@ import com.himanshurawat.notes.viewmodel.NoteViewModel
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import android.view.ViewGroup
+import android.widget.Button
+import com.crashlytics.android.Crashlytics
+
+
 
 private lateinit var noteViewModel: NoteViewModel
 
@@ -30,10 +35,11 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener { _ ->
             startActivity(Intent(this,AddNote::class.java))
         }
 

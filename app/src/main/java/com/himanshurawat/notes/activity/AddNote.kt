@@ -107,7 +107,7 @@ class AddNote : AppCompatActivity() {
                     val preTitle = description.split(" ")
 
                     val note = NoteEntity(noteId,preTitle[0],
-                            description, getDateTime(), 0)
+                            description, getDateTime())
 
                     viewModel.addNote(note)
                     finish()
@@ -117,7 +117,7 @@ class AddNote : AppCompatActivity() {
                 }else if(title != "" || description != "") {
 
                     val note = NoteEntity(noteId,title,
-                            description, getDateTime(), 0)
+                            description, getDateTime())
 
                     viewModel.addNote(note)
                     finish()
@@ -127,7 +127,7 @@ class AddNote : AppCompatActivity() {
                 }else if(title != "" && description == ""){
 
                     val note = NoteEntity(noteId, title,
-                            "", getDateTime(),0)
+                            "", getDateTime())
 
                     viewModel.addNote(note)
                     finish()

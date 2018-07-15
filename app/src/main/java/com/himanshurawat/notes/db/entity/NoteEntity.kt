@@ -16,6 +16,4 @@ data class NoteEntity(
         @ColumnInfo(name = "description")
         var description:String = "",
         @ColumnInfo(name = "date")
-        var date: String = "",
-        @ColumnInfo(name = "count")
-        var count: Long = 0)
+        var date: String = "")
