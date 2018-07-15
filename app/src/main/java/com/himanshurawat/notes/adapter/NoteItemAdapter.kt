@@ -29,7 +29,7 @@ class NoteItemAdapter(var noteList:List<NoteEntity>,var listener: OnItemClickLis
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        val note:NoteEntity? = noteList[position]
+        val note:NoteEntity? = noteList[holder.adapterPosition]
         if(note != null){
             holder.titleText.text = note.title
             holder.descriptionText.text = note.description

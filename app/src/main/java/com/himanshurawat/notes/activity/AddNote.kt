@@ -4,14 +4,20 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.ActionBar
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ImageSpan
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import com.himanshurawat.notes.viewmodel.NoteViewModel
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.db.entity.NoteEntity
@@ -63,9 +69,7 @@ class AddNote : AppCompatActivity() {
 
         if(!addNoteViewModel.isFilled){
             if(noteIntent.hasExtra(Constant.GET_NOTES)){
-                Log.i("Note","Inside If Loop")
-                Log.i("Note","Note ID $noteId")
-                val note = viewModel.getNoteById(noteId).observe(this, observer)
+                viewModel.getNoteById(noteId).observe(this, observer)
                 addNoteViewModel.isFilled = true
             }
         }
@@ -77,6 +81,8 @@ class AddNote : AppCompatActivity() {
         addNoteViewModel.description.observe(this, Observer { text ->
             activity_add_note_description_edit_text.setText(text)
         })
+
+
     }
 
 
@@ -94,15 +100,20 @@ class AddNote : AppCompatActivity() {
                 title = activity_add_note_title_edit_text.text.trim().toString()
                 description = activity_add_note_description_edit_text.text.trim().toString()
 
+                //When Title is Empty but Description Isn't
                 if(title == "" && description != ""){
+
                     //NoteEntity Object
-                    val note = NoteEntity(noteId,description[0].toString(),
+                    val preTitle = description.split(" ")
+
+                    val note = NoteEntity(noteId,preTitle[0],
                             description, getDateTime(), 0)
 
                     viewModel.addNote(note)
                     finish()
                     return true
 
+                //When Title and Description are not Empty
                 }else if(title != "" || description != "") {
 
                     val note = NoteEntity(noteId,title,
@@ -111,8 +122,9 @@ class AddNote : AppCompatActivity() {
                     viewModel.addNote(note)
                     finish()
                     return true
-                }else
-                    if(title != "" && description == ""){
+
+                //When Title is Not Empty
+                }else if(title != "" && description == ""){
 
                     val note = NoteEntity(noteId, title,
                             "", getDateTime(),0)
@@ -123,8 +135,9 @@ class AddNote : AppCompatActivity() {
 
                     }
 
+                //When Title and Description are Empty
                 else{
-                        toast("Add Something to Note Down")
+                        toast("Add Something to Save")
                 }
             }
             R.id.delete ->{
@@ -153,6 +166,14 @@ class AddNote : AppCompatActivity() {
         return true
     }
 
+
+    override fun onStop() {
+        super.onStop()
+        if(noteIntent.hasExtra(Constant.GET_NOTES)){
+
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         title = activity_add_note_title_edit_text.text.trim().toString()
@@ -163,22 +184,64 @@ class AddNote : AppCompatActivity() {
 
         addNoteViewModel.setTitle(title)
         addNoteViewModel.setDescription(description)
-
     }
+
+
 
     //Returns Time String
     private fun getDateTime():String {
         val now = Date()
-        val dateFormatter = SimpleDateFormat("EE, d-M-y 'at' h:m a")
-        return dateFormatter.format(now)
+        val dateFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = System.currentTimeMillis()
 
+        val month = calendar.get(Calendar.MONTH)
+        val date = calendar.get(Calendar.DATE)
+        return "$date ${getMonth(month)}, ${dateFormatter.format(now)}"
     }
 
 
-
-
-
-
+    private fun getMonth(month: Int): String{
+        when(month){
+            Calendar.JANUARY ->{
+                return "January"
+            }
+            Calendar.FEBRUARY ->{
+                return "February"
+            }
+            Calendar.MARCH ->{
+                return "March"
+            }
+            Calendar.APRIL ->{
+                return "April"
+            }
+            Calendar.MAY ->{
+                return "May"
+            }
+            Calendar.JUNE ->{
+                return "June"
+            }
+            Calendar.JULY ->{
+                return "July"
+            }
+            Calendar.AUGUST ->{
+                return "August"
+            }
+            Calendar.SEPTEMBER ->{
+                return "September"
+            }
+            Calendar.OCTOBER ->{
+                return "October"
+            }
+            Calendar.NOVEMBER ->{
+                return "November"
+            }
+            Calendar.DECEMBER ->{
+                return "December"
+            }
+        }
+        return ""
+    }
 
 
 }
