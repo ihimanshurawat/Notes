@@ -3,16 +3,10 @@ package com.himanshurawat.notes.viewmodel
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.ViewModel
-import android.arch.persistence.room.Room
-import android.provider.ContactsContract
-import android.support.annotation.NonNull
-import android.util.Log
 import com.himanshurawat.notes.db.NoteDatabase
 import com.himanshurawat.notes.db.entity.NoteEntity
-import org.jetbrains.anko.custom.async
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+
 
 class NoteViewModel constructor(application: Application):AndroidViewModel(application){
 
@@ -62,12 +56,6 @@ class NoteViewModel constructor(application: Application):AndroidViewModel(appli
         }
     }
 
-    //Update Note Count
-    fun updateCount(id: Long){
-        doAsync {
-            database.getNoteDao().updateCount(id)
-        }
-    }
 
 }
 

@@ -8,20 +8,12 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
 import android.view.Menu
-import android.view.MenuItem
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.adapter.SearchItemAdapter
 import com.himanshurawat.notes.viewmodel.SearchViewModel
-import kotlinx.android.synthetic.main.activity_add_note.*
 
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.content_search.*
-import android.text.Spannable
-import android.text.style.ImageSpan
-import android.graphics.drawable.Drawable
-import android.support.v4.content.ContextCompat
-import android.text.SpannableString
-import android.view.View
 import com.himanshurawat.notes.utils.Constant
 
 

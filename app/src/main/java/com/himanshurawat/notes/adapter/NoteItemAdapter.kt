@@ -1,6 +1,5 @@
 package com.himanshurawat.notes.adapter
 
-import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.db.entity.NoteEntity
-import android.content.ClipData.Item
 
 
 

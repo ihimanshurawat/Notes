@@ -2,22 +2,12 @@ package com.himanshurawat.notes.activity
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.ActionBar
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ImageSpan
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import com.himanshurawat.notes.viewmodel.NoteViewModel
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.db.entity.NoteEntity
@@ -28,7 +18,6 @@ import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.yesButton
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 

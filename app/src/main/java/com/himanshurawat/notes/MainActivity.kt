@@ -3,28 +3,20 @@ package com.himanshurawat.notes
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.opengl.Visibility
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.himanshurawat.notes.R.id.*
 import com.himanshurawat.notes.activity.AddNote
 import com.himanshurawat.notes.activity.Search
 import com.himanshurawat.notes.adapter.NoteItemAdapter
-import com.himanshurawat.notes.db.entity.NoteEntity
 import com.himanshurawat.notes.utils.Constant
 import com.himanshurawat.notes.viewmodel.NoteViewModel
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import android.view.ViewGroup
-import android.widget.Button
-import com.crashlytics.android.Crashlytics
 
 
 

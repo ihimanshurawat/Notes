@@ -1,16 +1,12 @@
 package com.himanshurawat.notes.adapter
 
 import android.content.Context
-import android.graphics.Color
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
 import android.widget.TextView
-import android.widget.Toast
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.db.entity.NoteEntity
 import android.text.Spannable
@@ -18,7 +14,6 @@ import android.text.style.ForegroundColorSpan
 import android.text.SpannableString
 import java.text.Normalizer
 
-import java.util.Collections.replaceAll
 
 
 
