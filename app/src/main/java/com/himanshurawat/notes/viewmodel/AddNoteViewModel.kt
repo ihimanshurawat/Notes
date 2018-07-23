@@ -25,7 +25,4 @@ class AddNoteViewModel: ViewModel() {
     }
 
 
-
-
-
 }

@@ -40,6 +40,7 @@ dependencies {
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.4'
     implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.github.pchmn:MaterialChipsInput:1.0.8'
 
 
     def lifecycle_version = "1.1.1"

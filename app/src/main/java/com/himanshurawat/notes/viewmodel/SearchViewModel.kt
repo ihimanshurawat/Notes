@@ -13,6 +13,7 @@ class SearchViewModel(application: Application): AndroidViewModel(application){
         noteDatabase = NoteDatabase.getInstance(this.getApplication())
     }
 
+    //Get All the Item for Searching
     fun getAllNotes():LiveData<List<NoteEntity>>{
 
         return noteDatabase.getNoteDao().allNotes()

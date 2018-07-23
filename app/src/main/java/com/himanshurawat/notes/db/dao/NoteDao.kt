@@ -9,7 +9,7 @@ import com.himanshurawat.notes.db.entity.NoteEntity
 interface NoteDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addNote(noteEntity: NoteEntity)
+    fun addNote(noteEntity: NoteEntity):Long
 
     @Query("SELECT * FROM notes ")
     fun allNotes(): LiveData<List<NoteEntity>>
@@ -26,5 +26,6 @@ interface NoteDao {
 
     @Update
     fun updateNote(note: NoteEntity)
+
 
 }
