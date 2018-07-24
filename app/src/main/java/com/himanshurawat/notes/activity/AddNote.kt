@@ -105,8 +105,10 @@ class AddNote : AppCompatActivity() {
                     //Setting NoteId to 0 to Auto Increment
                     noteId = 0
                     updateDatabase()
+                    displayToast("Note Created")
                 }else{
                     updateDatabase()
+                    displayToast("Note Updated")
                 }
             }
             R.id.add_note_menu_delete ->{
@@ -116,7 +118,7 @@ class AddNote : AppCompatActivity() {
                     title = "Delete Note"
                     yesButton {
                         viewModel.deleteNote(noteEntity)
-                        toast("Deleting")
+                        displayToast("Deleting")
                         finish()
                     }
                     noButton {  }
@@ -277,7 +279,6 @@ class AddNote : AppCompatActivity() {
                     description, getDateTime())
 
             viewModel.addNote(note).observe(this,noteIdObserver)
-            toast("Note Updated")
 
             return true
 
@@ -288,7 +289,7 @@ class AddNote : AppCompatActivity() {
                     description, getDateTime())
 
             viewModel.addNote(note).observe(this,noteIdObserver)
-            toast("Note Updated")
+
             return true
 
             //When Title is Not Empty
@@ -305,11 +306,13 @@ class AddNote : AppCompatActivity() {
 
         //When Title and Description are Empty
         else {
-            toast("Add Something to Save")
+            displayToast("Add Something to Save")
         }
         return true
     }
 
-
+    private fun displayToast(string: String){
+        toast(string)
+    }
 
 }
