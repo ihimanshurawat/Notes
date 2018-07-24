@@ -9,5 +9,10 @@ class Constant {
         //Prefs
         const val USER_PREF = "userPref"
         const val IS_24_HOUR_FORMAT = "is24HourFormat"
+
+
+        //Time Constants
+        const val TODAY = 86399000L
+        const val YESTERDAY = 172799000L
     }
 }

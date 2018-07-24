@@ -190,8 +190,9 @@ class AddNote : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        if(noteIntent.hasExtra(Constant.GET_NOTES)){
-
+        if(noteId != -1L){
+            updateDatabase()
+            displayToast("Saving Changes")
         }
     }
 
@@ -208,63 +209,6 @@ class AddNote : AppCompatActivity() {
     }
 
 
-
-    //Returns Time String
-    private fun getDateTime():String {
-        val now = Date()
-        val dateFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = System.currentTimeMillis()
-
-        val month = calendar.get(Calendar.MONTH)
-        val date = calendar.get(Calendar.DATE)
-        return "$date ${getMonth(month)}, ${dateFormatter.format(now)}"
-    }
-
-
-    private fun getMonth(month: Int): String{
-        when(month){
-            Calendar.JANUARY ->{
-                return "January"
-            }
-            Calendar.FEBRUARY ->{
-                return "February"
-            }
-            Calendar.MARCH ->{
-                return "March"
-            }
-            Calendar.APRIL ->{
-                return "April"
-            }
-            Calendar.MAY ->{
-                return "May"
-            }
-            Calendar.JUNE ->{
-                return "June"
-            }
-            Calendar.JULY ->{
-                return "July"
-            }
-            Calendar.AUGUST ->{
-                return "August"
-            }
-            Calendar.SEPTEMBER ->{
-                return "September"
-            }
-            Calendar.OCTOBER ->{
-                return "October"
-            }
-            Calendar.NOVEMBER ->{
-                return "November"
-            }
-            Calendar.DECEMBER ->{
-                return "December"
-            }
-        }
-        return ""
-    }
-
-
     private fun updateDatabase():Boolean{
         title = activity_add_note_title_edit_text.text.trim().toString()
         description = activity_add_note_description_edit_text.text.trim().toString()
@@ -276,7 +220,7 @@ class AddNote : AppCompatActivity() {
             val preTitle = description.split(" ")
 
             val note = NoteEntity(noteId,preTitle[0],
-                    description, getDateTime())
+                    description, getSystemTimeInMillis())
 
             viewModel.addNote(note).observe(this,noteIdObserver)
 
@@ -286,7 +230,7 @@ class AddNote : AppCompatActivity() {
         } else if (title != "" || description != "") {
 
             val note = NoteEntity(noteId, title,
-                    description, getDateTime())
+                    description, getSystemTimeInMillis())
 
             viewModel.addNote(note).observe(this,noteIdObserver)
 
@@ -296,7 +240,7 @@ class AddNote : AppCompatActivity() {
         } else if (title != "" && description == "") {
 
             val note = NoteEntity(noteId, title,
-                    "", getDateTime())
+                    "", getSystemTimeInMillis())
 
             viewModel.addNote(note).observe(this,noteIdObserver)
 
@@ -315,4 +259,7 @@ class AddNote : AppCompatActivity() {
         toast(string)
     }
 
+    private fun getSystemTimeInMillis(): Long{
+        return System.currentTimeMillis()
+    }
 }

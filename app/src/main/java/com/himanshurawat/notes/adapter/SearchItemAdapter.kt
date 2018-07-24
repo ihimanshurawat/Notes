@@ -46,10 +46,10 @@ class SearchItemAdapter(val context: Context,
         if(getSearchString() != "" && getSearchString().trim() != ""){
             var dataList = mutableListOf<NoteEntity>()
             for(items in searchItemList){
-
+                //Todo Fix Search
                 if (items.title.toLowerCase().contains(getSearchString().toLowerCase()) ||
                         items.description.toLowerCase().contains(getSearchString().toLowerCase()) ||
-                        items.date.toLowerCase().contains(getSearchString().toLowerCase())){
+                        items.date.toString().toLowerCase().contains(getSearchString().toLowerCase())){
                         dataList.add(items)
                 }
 
@@ -81,7 +81,8 @@ class SearchItemAdapter(val context: Context,
         val searchItem = filteredItemList[holder.adapterPosition]
         if(!searchString.equals("")) {
             holder.titleText.text = highlightText(getSearchString(),searchItem.title)
-            holder.dateText.text = highlightText(getSearchString(),searchItem.date)
+            //Todo Fix Date
+            holder.dateText.text = highlightText(getSearchString(),searchItem.date.toString())
             holder.descriptionText.text = highlightText(getSearchString(),searchItem.description)
             holder.item.setOnClickListener({
                 listener.onItemClick(filteredItemList[holder.adapterPosition].id)

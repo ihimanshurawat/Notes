@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
         }
 
         noteViewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
-        val noteAdapter = NoteItemAdapter(arrayListOf(),this)
+        val noteAdapter = NoteItemAdapter(this,arrayListOf(),this)
 
         noteViewModel.getNotes().observe(this, Observer { it->
                 if(it != null) {
