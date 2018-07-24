@@ -1,5 +1,7 @@
 package com.himanshurawat.notes.adapter
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -7,11 +9,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.db.entity.NoteEntity
+import com.himanshurawat.notes.utils.Constant
+import java.text.SimpleDateFormat
+import java.util.*
 
 
-
-class NoteItemAdapter(var noteList:List<NoteEntity>,var listener: OnItemClickListener):
+class NoteItemAdapter(val context: Context,var noteList:List<NoteEntity>,var listener: OnItemClickListener):
         RecyclerView.Adapter<NoteItemAdapter.NoteViewHolder>() {
+
+    private val userPref: SharedPreferences = context.applicationContext.getSharedPreferences(Constant.USER_PREF,Context.MODE_PRIVATE)
 
     interface OnItemClickListener{
         fun onNoteSelected(noteId: Long)
@@ -31,7 +37,7 @@ class NoteItemAdapter(var noteList:List<NoteEntity>,var listener: OnItemClickLis
         if(note != null){
             holder.titleText.text = note.title
             holder.descriptionText.text = note.description
-            holder.dateText.text = note.date
+            holder.dateText.text = getDateTime(note.date)
             holder.bind(note.id,listener)
         }
     }
@@ -53,6 +59,78 @@ class NoteItemAdapter(var noteList:List<NoteEntity>,var listener: OnItemClickLis
             })
         }
 
+    }
+
+
+
+
+    //Returns Time String
+    private fun getDateTime(timeInMillis: Long):String {
+        val currentTime = System.currentTimeMillis()
+        val now = Date(timeInMillis)
+        lateinit var dateFormatter: SimpleDateFormat
+        if(userPref.getBoolean(Constant.IS_24_HOUR_FORMAT,false)){
+            dateFormatter = SimpleDateFormat("HH:mm",Locale.getDefault())
+        }else {
+            dateFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        }
+
+        if(timeInMillis < currentTime && timeInMillis >= (currentTime - Constant.TODAY)){
+            return "Today, "+dateFormatter.format(now)
+        }else if(timeInMillis < (currentTime-Constant.TODAY)&& timeInMillis >= (currentTime-Constant.YESTERDAY)){
+            return "Yesterday, "+dateFormatter.format(now)
+        }
+
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = timeInMillis
+
+        val month = calendar.get(Calendar.MONTH)
+        val date = calendar.get(Calendar.DATE)
+
+        return "$date ${getMonth(month)}, ${dateFormatter.format(now)}"
+    }
+
+
+    private fun getMonth(month: Int): String{
+        when(month){
+            Calendar.JANUARY ->{
+                return "January"
+            }
+            Calendar.FEBRUARY ->{
+                return "February"
+            }
+            Calendar.MARCH ->{
+                return "March"
+            }
+            Calendar.APRIL ->{
+                return "April"
+            }
+            Calendar.MAY ->{
+                return "May"
+            }
+            Calendar.JUNE ->{
+                return "June"
+            }
+            Calendar.JULY ->{
+                return "July"
+            }
+            Calendar.AUGUST ->{
+                return "August"
+            }
+            Calendar.SEPTEMBER ->{
+                return "September"
+            }
+            Calendar.OCTOBER ->{
+                return "October"
+            }
+            Calendar.NOVEMBER ->{
+                return "November"
+            }
+            Calendar.DECEMBER ->{
+                return "December"
+            }
+        }
+        return ""
     }
 
 

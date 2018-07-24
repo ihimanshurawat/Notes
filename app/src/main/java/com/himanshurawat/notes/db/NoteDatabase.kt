@@ -6,6 +6,7 @@ import android.arch.persistence.room.RoomDatabase
 import android.content.Context
 import com.himanshurawat.notes.db.dao.NoteDao
 import com.himanshurawat.notes.db.entity.NoteEntity
+import com.himanshurawat.notes.utils.Constant
 
 @Database(entities = [(NoteEntity::class)],version = 1,exportSchema = false)
 abstract class NoteDatabase: RoomDatabase(){
@@ -20,7 +21,7 @@ abstract class NoteDatabase: RoomDatabase(){
             if(INSTANCE == null){
                 synchronized(NoteDatabase::class){
                     INSTANCE = Room.databaseBuilder(context.applicationContext,
-                            NoteDatabase::class.java,"note_db").build()
+                            NoteDatabase::class.java, Constant.DATABASE_NAME).build()
                 }
             }
             return INSTANCE as NoteDatabase

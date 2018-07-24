@@ -1,13 +1,19 @@
 package com.himanshurawat.notes.activity
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.ActionBar
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.DatePicker
+import android.widget.Toast
 import com.himanshurawat.notes.viewmodel.NoteViewModel
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.db.entity.NoteEntity
@@ -26,7 +32,7 @@ class AddNote : AppCompatActivity() {
     private lateinit var viewModel: NoteViewModel
     private lateinit var noteIntent: Intent
     private lateinit var noteEntity: NoteEntity
-    private var noteId: Long = -1
+    private var noteId:Long = -1L
     private lateinit var title: String
     private lateinit var description: String
 
@@ -38,23 +44,32 @@ class AddNote : AppCompatActivity() {
         }
     }
 
+    private val noteIdObserver: Observer<Long?> = Observer {
+        if(it != null){
+            noteId = it
+            invalidateOptionsMenu()
+        }
+    }
+
     private lateinit var addNoteViewModel: AddNoteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_note)
+        setSupportActionBar(activity_add_note_toolbar)
 
         //Setting Title and Enabling Home Up
         val ab: ActionBar? = supportActionBar
         ab?.title = ""
         ab?.setHomeButtonEnabled(true)
+        ab?.setDisplayHomeAsUpEnabled(true)
 
         //Intent
         noteIntent = intent
         //View Model
         viewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
         addNoteViewModel = ViewModelProviders.of(this).get(AddNoteViewModel::class.java)
-        noteId = noteIntent.getLongExtra(Constant.GET_NOTES,0)
+        noteId = noteIntent.getLongExtra(Constant.GET_NOTES,-1L)
 
         if(!addNoteViewModel.isFilled){
             if(noteIntent.hasExtra(Constant.GET_NOTES)){
@@ -85,61 +100,74 @@ class AddNote : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem):Boolean{
 
         when(item.itemId){
-            R.id.save ->{
-                title = activity_add_note_title_edit_text.text.trim().toString()
-                description = activity_add_note_description_edit_text.text.trim().toString()
-
-                //When Title is Empty but Description Isn't
-                if(title == "" && description != ""){
-
-                    //NoteEntity Object
-                    val preTitle = description.split(" ")
-
-                    val note = NoteEntity(noteId,preTitle[0],
-                            description, getDateTime())
-
-                    viewModel.addNote(note)
-                    finish()
-                    return true
-
-                //When Title and Description are not Empty
-                }else if(title != "" || description != "") {
-
-                    val note = NoteEntity(noteId,title,
-                            description, getDateTime())
-
-                    viewModel.addNote(note)
-                    finish()
-                    return true
-
-                //When Title is Not Empty
-                }else if(title != "" && description == ""){
-
-                    val note = NoteEntity(noteId, title,
-                            "", getDateTime())
-
-                    viewModel.addNote(note)
-                    finish()
-                    return true
-
-                    }
-
-                //When Title and Description are Empty
-                else{
-                        toast("Add Something to Save")
+            R.id.add_note_menu_save ->{
+                if(noteId == -1L) {
+                    //Setting NoteId to 0 to Auto Increment
+                    noteId = 0
+                    updateDatabase()
+                    displayToast("Note Created")
+                }else{
+                    updateDatabase()
+                    displayToast("Note Updated")
                 }
             }
-            R.id.delete ->{
+            R.id.add_note_menu_delete ->{
+
                 //Alert Before Delete Using Anko
                 alert("Sure you want to Delete?") {
                     title = "Delete Note"
                     yesButton {
                         viewModel.deleteNote(noteEntity)
-                        toast("Deleting")
+                        displayToast("Deleting")
                         finish()
                     }
                     noButton {  }
                 }.show()
+
+            }
+            R.id.add_note_menu_notification ->{
+
+                val userPref = application.getSharedPreferences(Constant.USER_PREF, Context.MODE_PRIVATE)
+                val is24H = userPref.getBoolean(Constant.USER_PREF,false)
+
+                val calendar = Calendar.getInstance()
+
+                if(calendar != null) {
+
+                    var yy = calendar.get(Calendar.YEAR)
+                    var mm = calendar.get(Calendar.MONTH)
+                    var dd = calendar.get(Calendar.DAY_OF_MONTH)
+                    var hh = calendar.get(Calendar.HOUR_OF_DAY)
+                    var mn = calendar.get(Calendar.MINUTE);
+
+                    val datePickerDialog = DatePickerDialog(AddNote@ this, DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+
+                        yy = year
+                        mm = month
+                        dd = dayOfMonth
+
+                    },yy,mm,dd)
+
+                    datePickerDialog.setButton(DatePickerDialog.BUTTON_POSITIVE,"OK",DialogInterface.OnClickListener { dialog, which ->
+                        val timePickerDialog  = TimePickerDialog(AddNote@this,TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
+
+                            hh = hourOfDay
+                            mn = minute
+
+
+                        },hh,mn,is24H)
+                        timePickerDialog.show()
+
+                        timePickerDialog.setButton(TimePickerDialog.BUTTON_POSITIVE,"OK",DialogInterface.OnClickListener { dialog, which ->
+                            toast("Jingalala")
+                        })
+
+
+                    })
+
+                    datePickerDialog.show()
+
+                }
 
             }
         }
@@ -149,8 +177,12 @@ class AddNote : AppCompatActivity() {
     //Hide Delete From Menu If It's New Note
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         super.onPrepareOptionsMenu(menu)
-        if(!intent.hasExtra(Constant.GET_NOTES)){
-            menu.findItem(R.id.delete).isVisible = false
+        if(noteId == -1L){
+            menu.findItem(R.id.add_note_menu_delete).isVisible = false
+            menu.findItem(R.id.add_note_menu_notification).isVisible = false
+        }else{
+            menu.findItem(R.id.add_note_menu_delete).isVisible = true
+            menu.findItem(R.id.add_note_menu_notification).isVisible = true
         }
         return true
     }
@@ -158,8 +190,9 @@ class AddNote : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        if(noteIntent.hasExtra(Constant.GET_NOTES)){
-
+        if(noteId != -1L){
+            updateDatabase()
+            displayToast("Saving Changes")
         }
     }
 
@@ -168,7 +201,7 @@ class AddNote : AppCompatActivity() {
         title = activity_add_note_title_edit_text.text.trim().toString()
         description = activity_add_note_description_edit_text.text.trim().toString()
         if(noteIntent.hasExtra(Constant.GET_NOTES)) {
-            viewModel.getNoteById(noteId).removeObserver {observer}
+            viewModel.getNoteById(noteId.toLong()).removeObserver {observer}
         }
 
         addNoteViewModel.setTitle(title)
@@ -176,61 +209,57 @@ class AddNote : AppCompatActivity() {
     }
 
 
+    private fun updateDatabase():Boolean{
+        title = activity_add_note_title_edit_text.text.trim().toString()
+        description = activity_add_note_description_edit_text.text.trim().toString()
 
-    //Returns Time String
-    private fun getDateTime():String {
-        val now = Date()
-        val dateFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = System.currentTimeMillis()
+        //When Title is Empty but Description Isn't
+        if (title == "" && description != "") {
 
-        val month = calendar.get(Calendar.MONTH)
-        val date = calendar.get(Calendar.DATE)
-        return "$date ${getMonth(month)}, ${dateFormatter.format(now)}"
-    }
+            //NoteEntity Object
+            val preTitle = description.split(" ")
 
+            val note = NoteEntity(noteId,preTitle[0],
+                    description, getSystemTimeInMillis())
 
-    private fun getMonth(month: Int): String{
-        when(month){
-            Calendar.JANUARY ->{
-                return "January"
-            }
-            Calendar.FEBRUARY ->{
-                return "February"
-            }
-            Calendar.MARCH ->{
-                return "March"
-            }
-            Calendar.APRIL ->{
-                return "April"
-            }
-            Calendar.MAY ->{
-                return "May"
-            }
-            Calendar.JUNE ->{
-                return "June"
-            }
-            Calendar.JULY ->{
-                return "July"
-            }
-            Calendar.AUGUST ->{
-                return "August"
-            }
-            Calendar.SEPTEMBER ->{
-                return "September"
-            }
-            Calendar.OCTOBER ->{
-                return "October"
-            }
-            Calendar.NOVEMBER ->{
-                return "November"
-            }
-            Calendar.DECEMBER ->{
-                return "December"
-            }
+            viewModel.addNote(note).observe(this,noteIdObserver)
+
+            return true
+
+            //When Title and Description are not Empty
+        } else if (title != "" || description != "") {
+
+            val note = NoteEntity(noteId, title,
+                    description, getSystemTimeInMillis())
+
+            viewModel.addNote(note).observe(this,noteIdObserver)
+
+            return true
+
+            //When Title is Not Empty
+        } else if (title != "" && description == "") {
+
+            val note = NoteEntity(noteId, title,
+                    "", getSystemTimeInMillis())
+
+            viewModel.addNote(note).observe(this,noteIdObserver)
+
+            return true
+
         }
-        return ""
+
+        //When Title and Description are Empty
+        else {
+            displayToast("Add Something to Save")
+        }
+        return true
     }
 
+    private fun displayToast(string: String){
+        toast(string)
+    }
 
+    private fun getSystemTimeInMillis(): Long{
+        return System.currentTimeMillis()
+    }
 }

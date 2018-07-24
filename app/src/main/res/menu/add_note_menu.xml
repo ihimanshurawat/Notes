@@ -3,13 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/delete"
+        android:id="@+id/add_note_menu_notification"
+        android:title="Notification"
+        android:icon="@drawable/notification_icon"
+        app:showAsAction="always"
+        />
+
+    <item
+        android:id="@+id/add_note_menu_delete"
         android:title="Delete"
         android:icon="@drawable/delete_icon"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/save"
+        android:id="@+id/add_note_menu_save"
         android:title="Save"
         android:icon="@drawable/check_icon"
         app:showAsAction="always" />

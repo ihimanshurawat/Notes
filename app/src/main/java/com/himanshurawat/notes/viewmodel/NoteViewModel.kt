@@ -3,9 +3,11 @@ package com.himanshurawat.notes.viewmodel
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import com.himanshurawat.notes.db.NoteDatabase
 import com.himanshurawat.notes.db.entity.NoteEntity
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 
 class NoteViewModel constructor(application: Application):AndroidViewModel(application){
@@ -17,6 +19,7 @@ class NoteViewModel constructor(application: Application):AndroidViewModel(appli
     //Initializing the Database Variable
     init {
         database = NoteDatabase.getInstance(this.getApplication())
+
     }
 
     //ViewModel Function to Fetch All Data
@@ -26,12 +29,17 @@ class NoteViewModel constructor(application: Application):AndroidViewModel(appli
     }
 
     //Function to Add Note to Database
-    fun addNote(note: NoteEntity){
-
+    fun addNote(note: NoteEntity): MutableLiveData<Long> {
+        var noteId: MutableLiveData<Long> = MutableLiveData()
         //Using Anko for Async Operations
         doAsync {
-            database.getNoteDao().addNote(note)
+            val id = database.getNoteDao().addNote(note)
+            uiThread {
+                noteId.value = id
+            }
         }
+
+        return noteId
     }
 
     //Deleting a Note from Database

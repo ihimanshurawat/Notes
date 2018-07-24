@@ -2,10 +2,13 @@ package com.himanshurawat.notes
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.text.format.DateFormat
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -22,6 +25,8 @@ import kotlinx.android.synthetic.main.content_main.*
 
 private lateinit var noteViewModel: NoteViewModel
 
+private lateinit var userPref: SharedPreferences
+
 class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
 
 
@@ -31,12 +36,15 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        userPref = application.getSharedPreferences(Constant.USER_PREF, Context.MODE_PRIVATE)
+
+
         fab.setOnClickListener { _ ->
             startActivity(Intent(this,AddNote::class.java))
         }
 
         noteViewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
-        val noteAdapter = NoteItemAdapter(arrayListOf(),this)
+        val noteAdapter = NoteItemAdapter(this,arrayListOf(),this)
 
         noteViewModel.getNotes().observe(this, Observer { it->
                 if(it != null) {
@@ -54,6 +62,9 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
                 LinearLayoutManager.VERTICAL,false)
 
 
+        //Check Whether User Uses 24H format
+        val is24H = DateFormat.is24HourFormat(applicationContext)
+        userPref.edit().putBoolean(Constant.IS_24_HOUR_FORMAT,is24H).apply()
 
 
     }
