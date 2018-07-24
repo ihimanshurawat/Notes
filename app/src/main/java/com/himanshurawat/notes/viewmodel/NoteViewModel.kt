@@ -14,13 +14,7 @@ class NoteViewModel constructor(application: Application):AndroidViewModel(appli
 
 
     //Database Reference
-    private val database:NoteDatabase
-
-    //Initializing the Database Variable
-    init {
-        database = NoteDatabase.getInstance(this.getApplication())
-
-    }
+    private val database:NoteDatabase = NoteDatabase.getInstance(this.getApplication())
 
     //ViewModel Function to Fetch All Data
     fun getNotes(): LiveData<List<NoteEntity>> {

@@ -1,6 +1,7 @@
 package com.himanshurawat.notes.adapter
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -12,9 +13,10 @@ import com.himanshurawat.notes.db.entity.NoteEntity
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.text.SpannableString
+import com.himanshurawat.notes.utils.Constant
 import java.text.Normalizer
-
-
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class SearchItemAdapter(val context: Context,
@@ -24,6 +26,7 @@ class SearchItemAdapter(val context: Context,
     var filteredItemList:List<NoteEntity>
     private var searchString: String
 
+    private val userPref: SharedPreferences = context.applicationContext.getSharedPreferences(Constant.USER_PREF,Context.MODE_PRIVATE)
 
 
     init {
@@ -46,10 +49,8 @@ class SearchItemAdapter(val context: Context,
         if(getSearchString() != "" && getSearchString().trim() != ""){
             var dataList = mutableListOf<NoteEntity>()
             for(items in searchItemList){
-                //Todo Fix Search
                 if (items.title.toLowerCase().contains(getSearchString().toLowerCase()) ||
-                        items.description.toLowerCase().contains(getSearchString().toLowerCase()) ||
-                        items.date.toString().toLowerCase().contains(getSearchString().toLowerCase())){
+                        items.description.toLowerCase().contains(getSearchString().toLowerCase())){
                         dataList.add(items)
                 }
 
@@ -81,9 +82,8 @@ class SearchItemAdapter(val context: Context,
         val searchItem = filteredItemList[holder.adapterPosition]
         if(!searchString.equals("")) {
             holder.titleText.text = highlightText(getSearchString(),searchItem.title)
-            //Todo Fix Date
-            holder.dateText.text = highlightText(getSearchString(),searchItem.date.toString())
             holder.descriptionText.text = highlightText(getSearchString(),searchItem.description)
+            holder.dateText.text = getDateTime(searchItem.date)
             holder.item.setOnClickListener({
                 listener.onItemClick(filteredItemList[holder.adapterPosition].id)
             })
@@ -128,6 +128,77 @@ class SearchItemAdapter(val context: Context,
     interface OnSearchItemClickListener{
         fun onItemClick(id: Long)
     }
+
+
+    //Returns Time String
+    private fun getDateTime(timeInMillis: Long):String {
+        val currentTime = System.currentTimeMillis()
+        val now = Date(timeInMillis)
+        lateinit var dateFormatter: SimpleDateFormat
+        if(userPref.getBoolean(Constant.IS_24_HOUR_FORMAT,false)){
+            dateFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
+        }else {
+            dateFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        }
+
+        if(timeInMillis < currentTime && timeInMillis >= (currentTime - Constant.TODAY)){
+            return "Today, "+dateFormatter.format(now)
+        }else if(timeInMillis < (currentTime- Constant.TODAY)&& timeInMillis >= (currentTime- Constant.YESTERDAY)){
+            return "Yesterday, "+dateFormatter.format(now)
+        }
+
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = timeInMillis
+
+        val month = calendar.get(Calendar.MONTH)
+        val date = calendar.get(Calendar.DATE)
+
+        return "$date ${getMonth(month)}, ${dateFormatter.format(now)}"
+    }
+
+
+    private fun getMonth(month: Int): String{
+        when(month){
+            Calendar.JANUARY ->{
+                return "January"
+            }
+            Calendar.FEBRUARY ->{
+                return "February"
+            }
+            Calendar.MARCH ->{
+                return "March"
+            }
+            Calendar.APRIL ->{
+                return "April"
+            }
+            Calendar.MAY ->{
+                return "May"
+            }
+            Calendar.JUNE ->{
+                return "June"
+            }
+            Calendar.JULY ->{
+                return "July"
+            }
+            Calendar.AUGUST ->{
+                return "August"
+            }
+            Calendar.SEPTEMBER ->{
+                return "September"
+            }
+            Calendar.OCTOBER ->{
+                return "October"
+            }
+            Calendar.NOVEMBER ->{
+                return "November"
+            }
+            Calendar.DECEMBER ->{
+                return "December"
+            }
+        }
+        return ""
+    }
+
 
 
 }

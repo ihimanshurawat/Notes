@@ -14,5 +14,10 @@ class Constant {
         //Time Constants
         const val TODAY = 86399000L
         const val YESTERDAY = 172799000L
+
+        //Notification
+        const val NOTE_ID = "noteId"
+        const val NOTIFICATION_CHANNEL_ID = "Notifications"
+        const val NOTES_NOTIFICATION_CHANNEL = "Notes Notification"
     }
 }

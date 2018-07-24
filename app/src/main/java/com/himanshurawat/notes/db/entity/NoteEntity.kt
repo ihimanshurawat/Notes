@@ -16,4 +16,8 @@ data class NoteEntity(
         @ColumnInfo(name = "description")
         var description:String = "",
         @ColumnInfo(name = "date")
-        var date: Long = 0)
+        var date: Long = 0,
+        @ColumnInfo(name = "notification")
+        var notification: Long = 0,
+        @ColumnInfo(name = "is_notification_set")
+        var isNotificationSet: Boolean = false)
