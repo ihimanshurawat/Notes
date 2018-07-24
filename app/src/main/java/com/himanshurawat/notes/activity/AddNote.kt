@@ -165,9 +165,6 @@ class AddNote : AppCompatActivity() {
 
                     datePickerDialog.show()
 
-
-
-
                 }
 
             }
@@ -301,7 +298,7 @@ class AddNote : AppCompatActivity() {
                     "", getDateTime())
 
             viewModel.addNote(note).observe(this,noteIdObserver)
-            toast("Note Updated")
+
             return true
 
         }
@@ -312,6 +309,7 @@ class AddNote : AppCompatActivity() {
         }
         return true
     }
+
 
 
 }
