@@ -81,6 +81,7 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
                 createChip()
             }
         }
+        
     }
 
     private val noteIdObserver: Observer<Long?> = Observer {

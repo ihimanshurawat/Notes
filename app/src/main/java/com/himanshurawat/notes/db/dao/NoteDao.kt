@@ -30,5 +30,8 @@ interface NoteDao {
     @Query("SELECT * FROM notes WHERE id = :noteId")
     fun getNoteByIdForNotification(noteId:Long):NoteEntity
 
+    @Query("SELECT * FROM notes")
+    fun getAllNotesForRebootReceiver():List<NoteEntity>
+
 
 }
