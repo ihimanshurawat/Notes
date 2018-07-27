@@ -2,10 +2,12 @@ package com.himanshurawat.notes.adapter
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.db.entity.NoteEntity
@@ -38,6 +40,26 @@ class NoteItemAdapter(val context: Context,var noteList:List<NoteEntity>,var lis
             holder.titleText.text = note.title
             holder.descriptionText.text = note.description
             holder.dateText.text = getDateTime(note.date)
+            if(note.isNotificationSet){
+                val currentTime = System.currentTimeMillis()
+                val notificationTime = note.notification
+
+                holder.clockImage.visibility = View.VISIBLE
+                holder.notificationText.visibility = View.VISIBLE
+
+                if(notificationTime > currentTime){
+                    holder.clockImage.setColorFilter(ContextCompat.getColor(context,R.color.colorAccent))
+                    holder.notificationText.setTextColor(ContextCompat.getColor(context,R.color.colorAccent))
+                    holder.notificationText.text = getNotificationDate(notificationTime)
+                }else{
+                    holder.clockImage.setColorFilter(ContextCompat.getColor(context,R.color.colorDate))
+                    holder.notificationText.setTextColor(ContextCompat.getColor(context,R.color.colorDate))
+                    holder.notificationText.text = getNotificationDate(notificationTime)
+                }
+            }else{
+                holder.clockImage.visibility = View.INVISIBLE
+                holder.notificationText.visibility = View.INVISIBLE
+            }
             holder.bind(note.id,listener)
         }
     }
@@ -52,6 +74,8 @@ class NoteItemAdapter(val context: Context,var noteList:List<NoteEntity>,var lis
         var titleText = itemView.findViewById<TextView>(R.id.note_item_view_title_text_view)
         var descriptionText = itemView.findViewById<TextView>(R.id.note_item_view_description_text_view)
         var dateText = itemView.findViewById<TextView>(R.id.note_item_view_date_text_view)
+        var clockImage = itemView.findViewById<ImageView>(R.id.note_item_view_clock_image_view)
+        var notificationText = itemView.findViewById<TextView>(R.id.note_item_view_notification_text_view)
 
         fun bind(noteId: Long,listener:OnItemClickListener){
             itemView.setOnClickListener({
@@ -90,6 +114,24 @@ class NoteItemAdapter(val context: Context,var noteList:List<NoteEntity>,var lis
         return "$date ${getMonth(month)}, ${dateFormatter.format(now)}"
     }
 
+
+    private fun getNotificationDate(timeInMillis: Long): String{
+        val currentTime = System.currentTimeMillis()
+        val now = Date(timeInMillis)
+        lateinit var dateFormatter: SimpleDateFormat
+        if(userPref.getBoolean(Constant.IS_24_HOUR_FORMAT,false)){
+            dateFormatter = SimpleDateFormat("HH:mm",Locale.getDefault())
+        }else {
+            dateFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        }
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = timeInMillis
+
+        val month = calendar.get(Calendar.MONTH)
+        val date = calendar.get(Calendar.DATE)
+
+        return "$date ${getMonth(month)}, ${dateFormatter.format(now)}"
+    }
 
     private fun getMonth(month: Int): String{
         when(month){
@@ -132,6 +174,7 @@ class NoteItemAdapter(val context: Context,var noteList:List<NoteEntity>,var lis
         }
         return ""
     }
+
 
 
 

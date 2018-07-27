@@ -12,10 +12,12 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.ActionBar
 import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
@@ -47,6 +49,9 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
     //Flag to Maintain Whether Item Is Begin Deleted or Not
     private var isDeleting = false
 
+    //SharedPref
+    private lateinit var userPref: SharedPreferences
+
     //Notification Variables
     private var yy: Int = 0
     private var mm: Int = 0
@@ -55,6 +60,7 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
     private var mn: Int = 0
 
     private var isNotificationSet = false
+    private var noteEntityInitialized = false
 
     private val observer:Observer<NoteEntity?> = Observer {
         if (it != null) {
@@ -62,6 +68,7 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             addNoteViewModel.setTitle(it.title)
             addNoteViewModel.setDescription(it.description)
             noteEntity = it
+            noteEntityInitialized = true
             isNotificationSet = noteEntity.isNotificationSet
             if(isNotificationSet){
                 val calendar:Calendar = Calendar.getInstance()
@@ -71,6 +78,7 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
                 dd = calendar.get(Calendar.DAY_OF_MONTH)
                 hh = calendar.get(Calendar.HOUR_OF_DAY)
                 mn = calendar.get(Calendar.MINUTE)
+                createChip()
             }
         }
     }
@@ -95,13 +103,14 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         ab?.setHomeButtonEnabled(true)
         ab?.setDisplayHomeAsUpEnabled(true)
 
+        userPref = application.getSharedPreferences(Constant.USER_PREF,Context.MODE_PRIVATE)
+
         //Intent
         noteIntent = intent
         //View Model
         viewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
         addNoteViewModel = ViewModelProviders.of(this).get(AddNoteViewModel::class.java)
         if(Intent.ACTION_SEND.equals(noteIntent.action) && noteIntent.type != null){
-            toast("Working")
             addNoteViewModel.setDescription(noteIntent.getStringExtra(Intent.EXTRA_TEXT))
         }
         noteId = noteIntent.getLongExtra(Constant.GET_NOTES,-1L)
@@ -124,6 +133,10 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             activity_add_note_description_edit_text.setText(text)
         })
 
+
+        activity_add_note_notification_chip_view.setOnDeleteClicked {
+            removeChip()
+        }
 
 
 
@@ -193,7 +206,6 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         super.onStop()
         if(noteId != -1L && !isDeleting){
             updateDatabase()
-            displayToast("Saving Changes")
         }
     }
 
@@ -223,13 +235,17 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             //NoteEntity Object
             val preTitle = description.split(" ")
 
-            val note: NoteEntity
-            if(isNotificationSet){
-                note = NoteEntity(noteId,preTitle[0],
-                        description, getSystemTimeInMillis(),getNotificationTime(yy,mm,dd,hh,mn),isNotificationSet)
+            val note: NoteEntity = if(isNotificationSet){
+                NoteEntity(noteId,preTitle[0]
+                        ,description
+                        ,if(noteEntityInitialized)noteEntity.date else getSystemTimeInMillis()
+                        ,getNotificationTime(yy,mm,dd,hh,mn)
+                        ,isNotificationSet)
             }else{
-                note = NoteEntity(noteId,preTitle[0],
-                        description, getSystemTimeInMillis())
+                NoteEntity(noteId
+                        ,preTitle[0]
+                        ,description
+                        ,if(noteEntityInitialized)noteEntity.date else getSystemTimeInMillis())
             }
 
 
@@ -243,12 +259,18 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         } else if (title != "" || description != "") {
 
 
-            val note:NoteEntity
-            if(isNotificationSet){
-                note = NoteEntity(noteId,title,description,getSystemTimeInMillis(),getNotificationTime(yy,mm,dd,hh,mn),isNotificationSet)
+            val note:NoteEntity = if(isNotificationSet){
+                NoteEntity(noteId
+                        ,title
+                        ,description
+                        ,if(noteEntityInitialized)noteEntity.date else getSystemTimeInMillis()
+                        ,getNotificationTime(yy,mm,dd,hh,mn)
+                        ,isNotificationSet)
             }else{
-                note = NoteEntity(noteId, title,
-                        description, getSystemTimeInMillis())
+                NoteEntity(noteId
+                        ,title
+                        ,description
+                        ,if(noteEntityInitialized)noteEntity.date else getSystemTimeInMillis())
             }
 
             viewModel.addNote(note).observe(this,noteIdObserver)
@@ -258,17 +280,18 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             //When Title is Not Empty
         } else if (title != "" && description == "") {
 
-            val note:NoteEntity
-            if(isNotificationSet){
-                note = NoteEntity(noteId
+            val note:NoteEntity = if(isNotificationSet){
+                NoteEntity(noteId
                         ,title
                         ,""
-                        ,getSystemTimeInMillis()
+                        ,if(noteEntityInitialized)noteEntity.date else getSystemTimeInMillis()
                         ,getNotificationTime(yy,mm,dd,hh,mn)
                         ,isNotificationSet)
             }else{
-                note = NoteEntity(noteId, title,
-                        "", getSystemTimeInMillis())
+                NoteEntity(noteId
+                        ,title
+                        ,""
+                        ,if(noteEntityInitialized)noteEntity.date else getSystemTimeInMillis())
             }
 
             viewModel.addNote(note).observe(this,noteIdObserver)
@@ -296,8 +319,16 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         val alarmManager: AlarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(applicationContext,NotificationReceiver::class.java)
         intent.putExtra(Constant.NOTE_ID,noteId)
-        val pendingIntent = PendingIntent.getBroadcast(this.applicationContext,noteId.toInt(),intent,PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = PendingIntent.getBroadcast(applicationContext,noteId.toInt(),intent,PendingIntent.FLAG_UPDATE_CURRENT)
         alarmManager.set(AlarmManager.RTC,getNotificationTime(yy,mm,dd,hh,mn),pendingIntent)
+    }
+
+    private fun deleteNotification(){
+        val alarmManager: AlarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(applicationContext,NotificationReceiver::class.java)
+        intent.putExtra(Constant.NOTE_ID,noteId)
+        val pendingIntent = PendingIntent.getBroadcast(applicationContext,noteId.toInt(),intent,PendingIntent.FLAG_UPDATE_CURRENT)
+        alarmManager.cancel(pendingIntent)
     }
 
     private fun getNotificationTime(year: Int,month: Int,day: Int, hour: Int,min: Int): Long{
@@ -356,17 +387,50 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
     }
 
 
+    private fun createChip(){
+        activity_add_note_notification_chip_view.visibility = View.VISIBLE
+        val calendar:Calendar = Calendar.getInstance()
+        calendar.set(yy,mm,dd,hh,mn)
+        val currentTime = getSystemTimeInMillis()
+        val notificationTime = calendar.timeInMillis
+
+        //Set Notification Only When Selected Time is ahead of Current Time
+        if(notificationTime > currentTime){
+            setNotification()
+            activity_add_note_notification_chip_view.label  = getDateTime(notificationTime)
+            activity_add_note_notification_chip_view.setLabelColor(ContextCompat.getColor(this,R.color.colorAccent))
+            activity_add_note_notification_chip_view.setDeleteIconColor(ContextCompat.getColor(this,R.color.colorAccent))
+        }else{
+            activity_add_note_notification_chip_view.label  = getDateTime(notificationTime)
+            activity_add_note_notification_chip_view.setLabelColor(ContextCompat.getColor(this,R.color.colorDate))
+            activity_add_note_notification_chip_view.setDeleteIconColor(ContextCompat.getColor(this,R.color.colorDate))
+        }
+    }
+
+    private fun removeChip(){
+        activity_add_note_notification_chip_view.visibility = View.GONE
+        isNotificationSet = false
+        deleteNotification()
+        yy = 0
+        mm = 0
+        dd = 0
+        hh = 0
+        mn = 0
+    }
+
+
+
 
     override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
         hh = hourOfDay
         mn = minute
 
         if(isNotificationSet){
-            setNotification()
+            createChip()
             displayToast("Notification Updated")
         }else if(!isNotificationSet){
             isNotificationSet = true
-            setNotification()
+            createChip()
             displayToast("Notification Set")
         }
     }
@@ -380,6 +444,69 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         showTimePicker()
 
     }
+
+    //Returns Time String
+    private fun getDateTime(timeInMillis: Long):String {
+        val now = Date(timeInMillis)
+        lateinit var dateFormatter: SimpleDateFormat
+        if(userPref.getBoolean(Constant.IS_24_HOUR_FORMAT,false)){
+            dateFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
+        }else {
+            dateFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        }
+        val calendar: Calendar = Calendar.getInstance()
+        calendar.timeInMillis = timeInMillis
+
+        val month = calendar.get(Calendar.MONTH)
+        val date = calendar.get(Calendar.DATE)
+
+        return "$date ${getMonth(month)}, ${dateFormatter.format(now)}"
+    }
+
+
+    private fun getMonth(month: Int): String{
+        when(month){
+            Calendar.JANUARY ->{
+                return "January"
+            }
+            Calendar.FEBRUARY ->{
+                return "February"
+            }
+            Calendar.MARCH ->{
+                return "March"
+            }
+            Calendar.APRIL ->{
+                return "April"
+            }
+            Calendar.MAY ->{
+                return "May"
+            }
+            Calendar.JUNE ->{
+                return "June"
+            }
+            Calendar.JULY ->{
+                return "July"
+            }
+            Calendar.AUGUST ->{
+                return "August"
+            }
+            Calendar.SEPTEMBER ->{
+                return "September"
+            }
+            Calendar.OCTOBER ->{
+                return "October"
+            }
+            Calendar.NOVEMBER ->{
+                return "November"
+            }
+            Calendar.DECEMBER ->{
+                return "December"
+            }
+        }
+        return ""
+    }
+
+
 
 
 }
