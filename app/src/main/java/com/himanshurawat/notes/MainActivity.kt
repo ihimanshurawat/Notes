@@ -38,6 +38,11 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
 
         userPref = application.getSharedPreferences(Constant.USER_PREF, Context.MODE_PRIVATE)
 
+        //Check Whether User Uses 24H format
+        val is24H = DateFormat.is24HourFormat(applicationContext)
+        userPref.edit().putBoolean(Constant.IS_24_HOUR_FORMAT,is24H).apply()
+
+
 
         fab.setOnClickListener { _ ->
             startActivity(Intent(this,AddNote::class.java))
@@ -62,9 +67,6 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
                 LinearLayoutManager.VERTICAL,false)
 
 
-        //Check Whether User Uses 24H format
-        val is24H = DateFormat.is24HourFormat(applicationContext)
-        userPref.edit().putBoolean(Constant.IS_24_HOUR_FORMAT,is24H).apply()
 
 
     }

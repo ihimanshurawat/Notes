@@ -32,12 +32,12 @@
             <EditText
                 android:id="@+id/activity_add_note_title_edit_text"
                 android:inputType="text"
-                android:theme="@style/Theme.AppCompat.Light"
+                android:theme="@style/AppTheme.EditTextTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:hint="Title"
-                android:maxLines="2"
+                android:maxLines="1"
                 android:minLines="1"
                 android:paddingBottom="8dp"
                 android:layout_marginEnd="16dp"
@@ -66,6 +66,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_scrollFlags="scroll"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
