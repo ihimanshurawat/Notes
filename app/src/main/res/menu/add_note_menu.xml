@@ -21,4 +21,9 @@
         android:icon="@drawable/check_icon"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/add_note_menu_share"
+        android:title="Share"
+        />
+
 </menu>

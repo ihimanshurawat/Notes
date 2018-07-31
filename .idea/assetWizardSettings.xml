@@ -11,30 +11,13 @@
                   <entry key="vectorAssetStep">
                     <value>
                       <PersistentState>
-                        <option name="children">
-                          <map>
-                            <entry key="clipartAsset">
-                              <value>
-                                <PersistentState>
-                                  <option name="values">
-                                    <map>
-                                      <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/device/ic_access_alarm_black_24dp.xml" />
-                                    </map>
-                                  </option>
-                                </PersistentState>
-                              </value>
-                            </entry>
-                          </map>
-                        </option>
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="ffffff" />
-                            <entry key="height" value="42" />
-                            <entry key="outputName" value="ic_square_icon" />
+                            <entry key="outputName" value="ic_square_notification" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="/Volumes/STORE N GO/square_icon.svg" />
-                            <entry key="width" value="42" />
+                            <entry key="sourceFile" value="C:\Users\andro\StudioProjects\Notes\app\src\main\res\drawable\square_notification.svg" />
                           </map>
                         </option>
                       </PersistentState>

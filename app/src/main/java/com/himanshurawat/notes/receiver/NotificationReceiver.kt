@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.support.v4.app.NotificationCompat
+import android.support.v4.content.ContextCompat
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.activity.AddNote
 import com.himanshurawat.notes.db.NoteDatabase
@@ -41,8 +42,9 @@ class NotificationReceiver : BroadcastReceiver() {
             val noteEntity = noteDao.getNoteByIdForNotification(noteId)
             uiThread {
                 notificationBuilder.setContentTitle(noteEntity.title)
-                notificationBuilder.setSmallIcon(R.drawable.check_icon)
+                notificationBuilder.setSmallIcon(R.drawable.square_notification)
                 notificationBuilder.setContentText(noteEntity.description)
+                notificationBuilder.color = ContextCompat.getColor(context,R.color.colorPrimaryDark)
                 val notificationIntent = Intent(context.applicationContext, AddNote::class.java)
                 notificationIntent.putExtra(Constant.GET_NOTES,noteId)
                 val pendingIntent :PendingIntent = PendingIntent.getActivity(context.applicationContext

@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
 import android.view.Menu
+import android.view.MenuItem
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.adapter.SearchItemAdapter
 import com.himanshurawat.notes.viewmodel.SearchViewModel
@@ -15,9 +17,13 @@ import com.himanshurawat.notes.viewmodel.SearchViewModel
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.content_search.*
 import com.himanshurawat.notes.utils.Constant
+import org.jetbrains.anko.share
 
 
 class Search : AppCompatActivity(), SearchView.OnQueryTextListener, SearchItemAdapter.OnSearchItemClickListener {
+
+
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
 
     override fun onItemClick(id: Long) {
         val intent = Intent(Search@this,AddNote::class.java)
@@ -41,6 +47,9 @@ class Search : AppCompatActivity(), SearchView.OnQueryTextListener, SearchItemAd
             actionBar.title = ""
         }
 
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
+
+
         adapter = SearchItemAdapter(this,arrayListOf(),this)
 
         //Setting Up Recycler View
@@ -63,17 +72,17 @@ class Search : AppCompatActivity(), SearchView.OnQueryTextListener, SearchItemAd
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.search_menu,menu)
         if(menu!=null) {
-            val search: SearchView? = menu.findItem(R.id.searchIcon).actionView as SearchView
+            val search: SearchView? = menu.findItem(R.id.search_menu_search).actionView as SearchView
             if(search!=null) {
                 search.isIconified = false
                 search.setIconifiedByDefault(true)
                 search.maxWidth = Integer.MAX_VALUE
                 search.setOnQueryTextListener(this)
             }
-
         }
         return true
     }
+
 
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -84,11 +93,12 @@ class Search : AppCompatActivity(), SearchView.OnQueryTextListener, SearchItemAd
     override fun onQueryTextChange(newText: String?): Boolean {
         if(newText != null){
             adapter.filterSearch(newText)
+            val bundle = Bundle()
+            bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM,newText)
+            firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH,bundle)
         }
         return true
     }
-
-
 
 
 }

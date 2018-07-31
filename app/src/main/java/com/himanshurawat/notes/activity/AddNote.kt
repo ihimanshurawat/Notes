@@ -21,6 +21,7 @@ import android.view.View
 import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
+import com.google.android.gms.actions.NoteIntents
 import com.himanshurawat.notes.viewmodel.NoteViewModel
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.db.entity.NoteEntity
@@ -28,10 +29,7 @@ import com.himanshurawat.notes.receiver.NotificationReceiver
 import com.himanshurawat.notes.utils.Constant
 import com.himanshurawat.notes.viewmodel.AddNoteViewModel
 import kotlinx.android.synthetic.main.activity_add_note.*
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.noButton
-import org.jetbrains.anko.toast
-import org.jetbrains.anko.yesButton
+import org.jetbrains.anko.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.min
@@ -110,8 +108,19 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         //View Model
         viewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
         addNoteViewModel = ViewModelProviders.of(this).get(AddNoteViewModel::class.java)
+
         if(Intent.ACTION_SEND.equals(noteIntent.action) && noteIntent.type != null){
             addNoteViewModel.setDescription(noteIntent.getStringExtra(Intent.EXTRA_TEXT))
+        }else if(NoteIntents.ACTION_CREATE_NOTE.equals(noteIntent.action)&& noteIntent.type != null){
+            if(noteIntent.extras !=null) {
+
+                addNoteViewModel.setTitle(resources.getString(R.string.self_note))
+
+                if (noteIntent.hasExtra(Intent.EXTRA_TEXT)) {
+                    addNoteViewModel.setDescription(noteIntent.getStringExtra(Intent.EXTRA_TEXT))
+                }
+
+            }
         }
         noteId = noteIntent.getLongExtra(Constant.GET_NOTES,-1L)
 
@@ -181,9 +190,16 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             }
             R.id.add_note_menu_notification ->{
                 showDatePicker()
-
-
             }
+            R.id.add_note_menu_share ->{
+                val shareIntent = Intent()
+                shareIntent.action = Intent.ACTION_SEND
+                shareIntent.putExtra(Intent.EXTRA_TEXT,getSharedString(activity_add_note_title_edit_text.text.trim().toString()
+                        ,activity_add_note_description_edit_text.text.trim().toString()))
+                shareIntent.type = "text/plain"
+                startActivity(shareIntent)
+            }
+
         }
         return super.onOptionsItemSelected(item)
     }
@@ -194,12 +210,15 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         if(noteId == -1L){
             menu.findItem(R.id.add_note_menu_delete).isVisible = false
             menu.findItem(R.id.add_note_menu_notification).isVisible = false
+            menu.findItem(R.id.add_note_menu_share).isVisible = false
         }else{
             menu.findItem(R.id.add_note_menu_delete).isVisible = true
             menu.findItem(R.id.add_note_menu_notification).isVisible = true
+            menu.findItem(R.id.add_note_menu_share).isVisible = true
         }
         return true
     }
+
 
 
     override fun onStop() {
@@ -226,6 +245,7 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
 
 
     private fun updateDatabase():Boolean{
+
         title = activity_add_note_title_edit_text.text.trim().toString()
         description = activity_add_note_description_edit_text.text.trim().toString()
 
@@ -506,6 +526,17 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         return ""
     }
 
+
+    private fun getSharedString(title: String, description: String): String{
+        if(title == "" && description != ""){
+            return description
+        }else if(title != "" && description == ""){
+            return title
+        }else if(title != "" && description != ""){
+            return "$title - $description"
+        }
+        return ""
+    }
 
 
 
