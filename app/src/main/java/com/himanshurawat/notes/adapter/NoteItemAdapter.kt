@@ -90,7 +90,6 @@ class NoteItemAdapter(val context: Context,var noteList:List<NoteEntity>,var lis
 
     //Returns Time String
     private fun getDateTime(timeInMillis: Long):String {
-        val currentTime = System.currentTimeMillis()
         val now = Date(timeInMillis)
         lateinit var dateFormatter: SimpleDateFormat
         if(userPref.getBoolean(Constant.IS_24_HOUR_FORMAT,false)){
@@ -99,11 +98,11 @@ class NoteItemAdapter(val context: Context,var noteList:List<NoteEntity>,var lis
             dateFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
         }
 
-        if(timeInMillis < currentTime && timeInMillis >= (currentTime - Constant.TODAY)){
-            return "Today, "+dateFormatter.format(now)
-        }else if(timeInMillis < (currentTime-Constant.TODAY)&& timeInMillis >= (currentTime-Constant.YESTERDAY)){
-            return "Yesterday, "+dateFormatter.format(now)
-        }
+//        if(timeInMillis < currentTime && timeInMillis >= (currentTime - Constant.TODAY)){
+//            return "Today, "+dateFormatter.format(now)
+//        }else if(timeInMillis < (currentTime-Constant.TODAY)&& timeInMillis >= (currentTime-Constant.YESTERDAY)){
+//            return "Yesterday, "+dateFormatter.format(now)
+//        }
 
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = timeInMillis
@@ -116,7 +115,6 @@ class NoteItemAdapter(val context: Context,var noteList:List<NoteEntity>,var lis
 
 
     private fun getNotificationDate(timeInMillis: Long): String{
-        val currentTime = System.currentTimeMillis()
         val now = Date(timeInMillis)
         lateinit var dateFormatter: SimpleDateFormat
         if(userPref.getBoolean(Constant.IS_24_HOUR_FORMAT,false)){

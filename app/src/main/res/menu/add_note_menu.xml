@@ -4,26 +4,26 @@
 
     <item
         android:id="@+id/add_note_menu_notification"
-        android:title="Notification"
+        android:title="@string/notification"
         android:icon="@drawable/notification_icon"
         app:showAsAction="always"
         />
 
     <item
         android:id="@+id/add_note_menu_delete"
-        android:title="Delete"
+        android:title="@string/delete"
         android:icon="@drawable/delete_icon"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/add_note_menu_save"
-        android:title="Save"
+        android:title="@string/save"
         android:icon="@drawable/check_icon"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/add_note_menu_share"
-        android:title="Share"
+        android:title="@string/share"
         />
 
 </menu>

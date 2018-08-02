@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notes</string>
+    <string name="action_settings">El fraguado</string>
+    <string name="title_activity_search">Buscar</string>
+    <string name="self_note">Nota personal</string>
+    <string name="title">Título</string>
+    <string name="description">Descripción</string>
+    <string name="notification">Notificación</string>
+    <string name="delete">Borrar</string>
+    <string name="save">Salvar</string>
+    <string name="share">Compartir</string>
+    <string name="search">Buscar</string>
+    <string name="deleting">Eliminando</string>
+    <string name="delete_note">Borrar nota</string>
+    <string name="notification_set">Conjunto de notificaciones</string>
+    <string name="note_created">Nota creada</string>
+    <string name="add_something_to_save">Agrega algo para guardar</string>
+    <string name="notification_updated">Notificación actualizada</string>
+    <string name="sure_you_want_to_delete">¿Quieres borrar?</string>
+</resources>

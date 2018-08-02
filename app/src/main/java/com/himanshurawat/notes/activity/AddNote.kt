@@ -12,6 +12,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.ActionBar
 import android.text.Editable
@@ -37,29 +38,31 @@ import kotlin.math.min
 class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
 
+    //Lateinits
     private lateinit var viewModel: NoteViewModel
-    private lateinit var noteIntent: Intent
+    private lateinit var addNoteViewModel: AddNoteViewModel
     private lateinit var noteEntity: NoteEntity
-    private var noteId:Long = -1L
     private lateinit var title: String
     private lateinit var description: String
-
-    //Flag to Maintain Whether Item Is Begin Deleted or Not
-    private var isDeleting = false
-
-    //SharedPref
     private lateinit var userPref: SharedPreferences
 
-    //Notification Variables
+    //Variables
+    //Notification
     private var yy: Int = 0
     private var mm: Int = 0
     private var dd: Int = 0
     private var hh: Int = 0
     private var mn: Int = 0
+    //Note Id
+    private var noteId:Long = -1L
 
+    //Flags
     private var isNotificationSet = false
     private var noteEntityInitialized = false
+    private var isDeleting = false
 
+
+    //Observers
     private val observer:Observer<NoteEntity?> = Observer {
         if (it != null) {
 
@@ -84,11 +87,13 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
     private val noteIdObserver: Observer<Long?> = Observer {
         if(it != null){
             noteId = it
+            viewModel.getNoteById(noteId).observe(this, observer)
+            addNoteViewModel.isFilled = true
             invalidateOptionsMenu()
         }
     }
 
-    private lateinit var addNoteViewModel: AddNoteViewModel
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,31 +108,29 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
 
         userPref = application.getSharedPreferences(Constant.USER_PREF,Context.MODE_PRIVATE)
 
-        //Intent
-        noteIntent = intent
         //View Model
         viewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
         addNoteViewModel = ViewModelProviders.of(this).get(AddNoteViewModel::class.java)
 
-        if(Intent.ACTION_SEND.equals(noteIntent.action) && noteIntent.type != null){
-            addNoteViewModel.setDescription(noteIntent.getStringExtra(Intent.EXTRA_TEXT))
-        }else if(NoteIntents.ACTION_CREATE_NOTE.equals(noteIntent.action)&& noteIntent.type != null){
-            if(noteIntent.extras !=null) {
+        if(Intent.ACTION_SEND.equals(intent.action) && intent.type != null){
+            addNoteViewModel.setDescription(intent.getStringExtra(Intent.EXTRA_TEXT))
+        }else if(NoteIntents.ACTION_CREATE_NOTE.equals(intent.action)&& intent.type != null){
+            if(intent.extras !=null) {
 
                 addNoteViewModel.setTitle(resources.getString(R.string.self_note))
 
-                if (noteIntent.hasExtra(Intent.EXTRA_TEXT)) {
-                    addNoteViewModel.setDescription(noteIntent.getStringExtra(Intent.EXTRA_TEXT))
+                if (intent.hasExtra(Intent.EXTRA_TEXT)) {
+                    addNoteViewModel.setDescription(intent.getStringExtra(Intent.EXTRA_TEXT))
                 }
 
             }
         }
-        noteId = noteIntent.getLongExtra(Constant.GET_NOTES,-1L)
+        noteId = intent.getLongExtra(Constant.GET_NOTES,-1L)
 
 
 
         if(!addNoteViewModel.isFilled){
-            if(noteIntent.hasExtra(Constant.GET_NOTES)){
+            if(intent.hasExtra(Constant.GET_NOTES)){
                 viewModel.getNoteById(noteId).observe(this, observer)
                 addNoteViewModel.isFilled = true
             }
@@ -147,8 +150,6 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             removeChip()
         }
 
-
-
     }
 
 
@@ -165,22 +166,25 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             R.id.add_note_menu_save ->{
                 if(noteId == -1L) {
                     //Setting NoteId to 0 to Auto Increment
-                    noteId = 0
-                    updateDatabase()
-                    displayToast("Note Created")
-                }else{
-                    updateDatabase()
-                    displayToast("Note Updated")
+
+                    if(updateDatabase()) {
+                        //Note Created Snackbar
+                        displaySnackbar(activity_add_note_root, getString(R.string.note_created))
+                    }
+                    //Snackbar.make(activity_add_note_root,"Note Created", Snackbar.LENGTH_SHORT).show()
+                   //displayToast("Note Created")
                 }
             }
             R.id.add_note_menu_delete ->{
 
                 //Alert Before Delete Using Anko
-                alert("Sure you want to Delete?") {
-                    title = "Delete Note"
+                alert(getString(R.string.sure_you_want_to_delete)) {
+                    title = getString(R.string.delete_note)
                     yesButton {
                         viewModel.deleteNote(noteEntity)
-                        displayToast("Deleting")
+                        //Deleting Snackbar
+                        displayToast(getString(R.string.deleting))
+                        //displayToast(getString(R.string.deleting))
                         isDeleting = true
                         finish()
                     }
@@ -211,10 +215,12 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             menu.findItem(R.id.add_note_menu_delete).isVisible = false
             menu.findItem(R.id.add_note_menu_notification).isVisible = false
             menu.findItem(R.id.add_note_menu_share).isVisible = false
+            menu.findItem(R.id.add_note_menu_save).isVisible = true
         }else{
             menu.findItem(R.id.add_note_menu_delete).isVisible = true
             menu.findItem(R.id.add_note_menu_notification).isVisible = true
             menu.findItem(R.id.add_note_menu_share).isVisible = true
+            menu.findItem(R.id.add_note_menu_save).isVisible = false
         }
         return true
     }
@@ -233,7 +239,7 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         if(!isDeleting) {
             title = activity_add_note_title_edit_text.text.trim().toString()
             description = activity_add_note_description_edit_text.text.trim().toString()
-            if (noteIntent.hasExtra(Constant.GET_NOTES)) {
+            if (intent.hasExtra(Constant.GET_NOTES)) {
                 viewModel.getNoteById(noteId).removeObserver { observer }
             }
 
@@ -251,6 +257,11 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
 
         //When Title is Empty but Description Isn't
         if (title == "" && description != "") {
+
+            if(noteId == -1L){
+                noteId = 0
+            }
+
 
             //NoteEntity Object
             val preTitle = description.split(" ")
@@ -278,6 +289,9 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             //When Title and Description are not Empty
         } else if (title != "" || description != "") {
 
+            if(noteId == -1L){
+                noteId = 0
+            }
 
             val note:NoteEntity = if(isNotificationSet){
                 NoteEntity(noteId
@@ -299,6 +313,10 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
 
             //When Title is Not Empty
         } else if (title != "" && description == "") {
+
+            if(noteId == -1L){
+                noteId = 0
+            }
 
             val note:NoteEntity = if(isNotificationSet){
                 NoteEntity(noteId
@@ -322,9 +340,11 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
 
         //When Title and Description are Empty
         else {
-            displayToast("Add Something to Save")
+            //Add Something to Save Snackbar
+            displaySnackbar(activity_add_note_root,getString(R.string.add_something_to_save))
+            //displayToast("Add Something to Save")
         }
-        return true
+        return false
     }
 
     private fun displayToast(string: String){
@@ -358,9 +378,6 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
     }
 
     private fun showDatePicker(){
-
-
-
         val year: Int
         val month: Int
         val day: Int
@@ -447,11 +464,14 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
 
         if(isNotificationSet){
             createChip()
-            displayToast("Notification Updated")
+            //Notification Updated
+            displaySnackbar(activity_add_note_root,getString(R.string.notification_updated))
+            //displayToast("Notification Updated")
         }else if(!isNotificationSet){
             isNotificationSet = true
             createChip()
-            displayToast("Notification Set")
+            displaySnackbar(activity_add_note_root,getString(R.string.notification_set))
+            //displayToast(getString(R.string.notification_set))
         }
     }
 
@@ -536,6 +556,10 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             return "$title - $description"
         }
         return ""
+    }
+
+    private fun displaySnackbar(view: View,string: String){
+        Snackbar.make(view,string,Snackbar.LENGTH_SHORT).show()
     }
 
 

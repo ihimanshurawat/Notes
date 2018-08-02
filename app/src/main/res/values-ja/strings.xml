@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notes</string>
+
+    <string name="action_settings">セッティング</string>
+    <string name="title_activity_search">サーチ</string>
+    <string name="self_note">セルフノート</string>
+    <string name="title">タイトル</string>
+    <string name="description">説明</string>
+    <string name="notification">お知らせ</string>
+    <string name="delete">削除</string>
+    <string name="save">セーブ</string>
+    <string name="share">シェア</string>
+    <string name="search">サーチ</string>
+    <string name="deleting">削除</string>
+    <string name="delete_note">メモを削除</string>
+    <string name="notification_set">通知セット</string>
+    <string name="note_created">作成されたメモ</string>
+    <string name="add_something_to_save">保存前に追加する</string>
+    <string name="notification_updated">通知の更新</string>
+    <string name="sure_you_want_to_delete">削除しますか？</string>
+</resources>

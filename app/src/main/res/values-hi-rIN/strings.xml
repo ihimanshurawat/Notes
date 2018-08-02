@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_settings">सेटिंग्स</string>
+    <string name="title_activity_search">" खोज"</string>
+    <string name="self_note">" स्वयं नोट"</string>
+    <string name="title">" शीर्षक"</string>
+    <string name="description">विवरण</string>
+    <string name="notification">अधिसूचना</string>
+    <string name="delete">"डिलीट "</string>
+    <string name="save">सेव</string>
+    <string name="share">"शेयर "</string>
+    <string name="search">"सर्च "</string>
+    <string name="note_created">नोट बन गया</string>
+    <string name="deleting">हटाया जा रहा है</string>
+    <string name="delete_note">डिलीट नोट</string>
+    <string name="notification_set">" अधिसूचना सेट"</string>
+    <string name="add_something_to_save">कुछ दाल कर सेव करे</string>
+    <string name="notification_updated">अधिसूचना अद्यतन</string>
+    <string name="app_name">Notes</string>
+    <string name="sure_you_want_to_delete">निश्चित रूप से आप हटाना चाहते हैं?</string>
+
+</resources>

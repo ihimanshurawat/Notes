@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notes</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="title_activity_search">Suche</string>
+    <string name="self_note">Selbst Notiz</string>
+    <string name="title">Titel</string>
+    <string name="description">Beschreibung</string>
+    <string name="notification">Benachrichtigung</string>
+    <string name="delete">Löschen</string>
+    <string name="save">Ersparen</string>
+    <string name="share">Aktie</string>
+    <string name="search">Suche</string>
+    <string name="deleting">Löschen</string>
+    <string name="delete_note">Notiz löschen</string>
+    <string name="notification_set">Benachrichtigung ist festgelegt</string>
+    <string name="note_created">Hinweis erstellt</string>
+    <string name="add_something_to_save">Fügen Sie etwas zum Speichern hinzu</string>
+    <string name="notification_updated">Benachrichtigung aktualisiert</string>
+    <string name="sure_you_want_to_delete">Sicher möchtest du löschen?</string>
+
+    Sicher möchtest du löschen?
+
+
+</resources>

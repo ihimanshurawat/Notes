@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notes</string>
+    <string name="action_settings">إعدادات</string>
+    <string name="title_activity_search">بحث</string>
+    <string name="self_note">ملاحظة شخصية</string>
+    <string name="title">عنوان</string>
+    <string name="description">وصف</string>
+    <string name="notification">إعلام</string>
+    <string name="delete">حذف</string>
+    <string name="save">حفظ</string>
+    <string name="share">نصيب</string>
+    <string name="search">بحث</string>
+    <string name="deleting">حذف</string>
+    <string name="delete_note">حذف الملاحظة</string>
+    <string name="notification_set">الإشعار تم الحفظ</string>
+    <string name="note_created">ملاحظة خلقت</string>
+    <string name="add_something_to_save">"أضف شيئًا للحفظ "</string>
+    <string name="notification_updated">"الإخطار تحديث "</string>
+    <string name="sure_you_want_to_delete">هل تريد حذف؟</string>
+</resources>
