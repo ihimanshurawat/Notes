@@ -186,6 +186,9 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
                         displayToast(getString(R.string.deleting))
                         //displayToast(getString(R.string.deleting))
                         isDeleting = true
+                        if(isNotificationSet){
+                            deleteNotification()
+                        }
                         finish()
                     }
                     noButton {  }
