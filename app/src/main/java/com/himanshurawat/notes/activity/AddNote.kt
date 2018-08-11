@@ -23,6 +23,7 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
 import com.google.android.gms.actions.NoteIntents
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.himanshurawat.notes.viewmodel.NoteViewModel
 import com.himanshurawat.notes.R
 import com.himanshurawat.notes.db.entity.NoteEntity
@@ -45,6 +46,7 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
     private lateinit var title: String
     private lateinit var description: String
     private lateinit var userPref: SharedPreferences
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
 
     //Variables
     //Notification
@@ -107,6 +109,8 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         ab?.setDisplayHomeAsUpEnabled(true)
 
         userPref = application.getSharedPreferences(Constant.USER_PREF,Context.MODE_PRIVATE)
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
         //View Model
         viewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
@@ -177,6 +181,8 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             }
             R.id.add_note_menu_delete ->{
 
+                firebaseAnalytics.logEvent(Constant.DELETE_ICON_CLICKED,null)
+
                 //Alert Before Delete Using Anko
                 alert(getString(R.string.sure_you_want_to_delete)) {
                     title = getString(R.string.delete_note)
@@ -189,13 +195,18 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
                         if(isNotificationSet){
                             deleteNotification()
                         }
+                        firebaseAnalytics.logEvent(Constant.DELETE_CONFIRMED,null)
                         finish()
                     }
-                    noButton {  }
+                    noButton {
+                        firebaseAnalytics.logEvent(Constant.DELETE_CANCELLED,null)
+                    }
                 }.show()
 
             }
             R.id.add_note_menu_notification ->{
+                firebaseAnalytics.logEvent(Constant.ALARM_ICON_CLICKED,null)
+
                 showDatePicker()
             }
             R.id.add_note_menu_share ->{
@@ -287,6 +298,8 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
 
             viewModel.addNote(note).observe(this,noteIdObserver)
 
+            firebaseAnalytics.logEvent(Constant.SAVING_ONLY_DESCRIPTION_NOTE,null)
+
             return true
 
             //When Title and Description are not Empty
@@ -311,6 +324,8 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             }
 
             viewModel.addNote(note).observe(this,noteIdObserver)
+
+            firebaseAnalytics.logEvent(Constant.SAVING_COMPLETE_NOTE,null)
 
             return true
 
@@ -337,6 +352,8 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
 
             viewModel.addNote(note).observe(this,noteIdObserver)
 
+            firebaseAnalytics.logEvent(Constant.SAVING_ONLY_TITLE_NOTE,null)
+
             return true
 
         }
@@ -345,6 +362,7 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         else {
             //Add Something to Save Snackbar
             displaySnackbar(activity_add_note_root,getString(R.string.add_something_to_save))
+            firebaseAnalytics.logEvent(Constant.SAVING_EMPTY_NOTE,null)
             //displayToast("Add Something to Save")
         }
         return false
@@ -465,17 +483,26 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         hh = hourOfDay
         mn = minute
 
+        firebaseAnalytics.logEvent(Constant.ALARM_TIME_SET,null)
+
         if(isNotificationSet){
             createChip()
             //Notification Updated
             displaySnackbar(activity_add_note_root,getString(R.string.notification_updated))
+
+            firebaseAnalytics.logEvent(Constant.ALARM_TIME_UPDATED,null)
+
             //displayToast("Notification Updated")
         }else if(!isNotificationSet){
             isNotificationSet = true
             createChip()
             displaySnackbar(activity_add_note_root,getString(R.string.notification_set))
+
+            firebaseAnalytics.logEvent(Constant.ALARM_SET,null)
+
             //displayToast(getString(R.string.notification_set))
         }
+
     }
 
     //onDateSetListener
@@ -483,6 +510,8 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         yy = year
         mm = month
         dd = dayOfMonth
+
+        firebaseAnalytics.logEvent(Constant.ALARM_DATE_SET,null)
 
         showTimePicker()
 
