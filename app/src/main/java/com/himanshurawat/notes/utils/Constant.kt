@@ -35,5 +35,21 @@ class Constant {
         const val SAVING_COMPLETE_NOTE = "saving_complete_note"
         const val SAVING_ONLY_TITLE_NOTE = "saving_only_title_note"
         const val SAVING_ONLY_DESCRIPTION_NOTE = "saving_only_description_note"
+
+        const val CHIP_CANCELLED = "chip_cancelled"
+        const val CHIP_CREATED = "chip_created"
+        const val CHIP_TIME_AHEAD = "chip_time_ahead"
+        const val CHIP_TIME_BEHIND = "chip_time_behind"
+
+        const val ALARM_CANCELLED = "alarm_cancelled"
+
+        const val ADD_NOTE = "add_note"
+        const val SEARCH_ICON_CLICKED = "search_icon_clicked"
+
+        const val DISPLAY_TOAST = "display_toast"
+        const val TOAST_STRING = "toast_string"
+
+        const val DISPLAY_SNACK_BAR = "display_snack_bar"
+        const val SNACK_BAR_STRING = "snack_bar_string"
     }
 }

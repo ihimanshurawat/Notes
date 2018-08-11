@@ -12,6 +12,7 @@ import android.text.format.DateFormat
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.himanshurawat.notes.activity.AddNote
 import com.himanshurawat.notes.activity.Search
 import com.himanshurawat.notes.adapter.NoteItemAdapter
@@ -27,6 +28,8 @@ private lateinit var noteViewModel: NoteViewModel
 
 private lateinit var userPref: SharedPreferences
 
+private lateinit var firebaseAnalytics: FirebaseAnalytics
+
 class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
 
 
@@ -38,6 +41,8 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
 
         userPref = application.getSharedPreferences(Constant.USER_PREF, Context.MODE_PRIVATE)
 
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
+
         //Check Whether User Uses 24H format
         val is24H = DateFormat.is24HourFormat(applicationContext)
         userPref.edit().putBoolean(Constant.IS_24_HOUR_FORMAT,is24H).apply()
@@ -45,6 +50,9 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
 
 
         fab.setOnClickListener { _ ->
+
+            firebaseAnalytics.logEvent(Constant.ADD_NOTE,null)
+
             startActivity(Intent(this,AddNote::class.java))
         }
 
@@ -84,6 +92,8 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
         when(item.itemId){
 
             R.id.search ->{
+
+                firebaseAnalytics.logEvent(Constant.SEARCH_ICON_CLICKED,null)
                 startActivity(Intent(this@MainActivity, Search::class.java))
             }
         }

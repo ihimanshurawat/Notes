@@ -370,6 +370,9 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
 
     private fun displayToast(string: String){
         toast(string)
+        val bundle = Bundle()
+        bundle.putString(Constant.TOAST_STRING,string)
+        firebaseAnalytics.logEvent(Constant.DISPLAY_TOAST,bundle)
     }
 
     private fun getSystemTimeInMillis(): Long{
@@ -390,6 +393,7 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         intent.putExtra(Constant.NOTE_ID,noteId)
         val pendingIntent = PendingIntent.getBroadcast(applicationContext,noteId.toInt(),intent,PendingIntent.FLAG_UPDATE_CURRENT)
         alarmManager.cancel(pendingIntent)
+        firebaseAnalytics.logEvent(Constant.ALARM_CANCELLED,null)
     }
 
     private fun getNotificationTime(year: Int,month: Int,day: Int, hour: Int,min: Int): Long{
@@ -452,17 +456,23 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         val currentTime = getSystemTimeInMillis()
         val notificationTime = calendar.timeInMillis
 
+        firebaseAnalytics.logEvent(Constant.CHIP_CREATED,null)
+
         //Set Notification Only When Selected Time is ahead of Current Time
         if(notificationTime > currentTime){
             setNotification()
             activity_add_note_notification_chip_view.label  = getDateTime(notificationTime)
             activity_add_note_notification_chip_view.setLabelColor(ContextCompat.getColor(this,R.color.colorAccent))
             activity_add_note_notification_chip_view.setDeleteIconColor(ContextCompat.getColor(this,R.color.colorAccent))
+            firebaseAnalytics.logEvent(Constant.CHIP_TIME_AHEAD,null)
         }else{
             activity_add_note_notification_chip_view.label  = getDateTime(notificationTime)
             activity_add_note_notification_chip_view.setLabelColor(ContextCompat.getColor(this,R.color.colorDate))
             activity_add_note_notification_chip_view.setDeleteIconColor(ContextCompat.getColor(this,R.color.colorDate))
+            firebaseAnalytics.logEvent(Constant.CHIP_TIME_BEHIND,null)
         }
+
+
     }
 
     private fun removeChip(){
@@ -474,6 +484,8 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         dd = 0
         hh = 0
         mn = 0
+
+        firebaseAnalytics.logEvent(Constant.CHIP_CANCELLED,null)
     }
 
 
@@ -592,6 +604,9 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
 
     private fun displaySnackbar(view: View,string: String){
         Snackbar.make(view,string,Snackbar.LENGTH_SHORT).show()
+        val bundle = Bundle()
+        bundle.putString(Constant.SNACK_BAR_STRING,string)
+        firebaseAnalytics.logEvent(Constant.DISPLAY_SNACK_BAR,bundle)
     }
 
 
