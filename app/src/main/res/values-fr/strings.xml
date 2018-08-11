@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notes</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="title_activity_search">Fouiller</string>
+    <string name="self_note">Note pour moi-même</string>
+    <string name="title">Titre</string>
+    <string name="description">La description</string>
+    <string name="notification">Notification</string>
+    <string name="delete">Effacer</string>
+    <string name="save">Sauver</string>
+    <string name="share">Partager</string>
+    <string name="search">La perquisition</string>
+    <string name="deleting">Effacer</string>
+    <string name="delete_note">Supprimer la note</string>
+    <string name="notification_set">Réglage de la notification</string>
+    <string name="note_created">Note créée</string>
+    <string name="add_something_to_save">Ajouter quelque chose à sauver</string>
+    <string name="notification_updated">Notification sont mis à jour</string>
+    <string name="sure_you_want_to_delete">vous voulez supprimer?</string>
+</resources>

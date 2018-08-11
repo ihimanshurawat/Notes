@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notes</string>
+    <string name="action_settings">Configurações</string>
+    <string name="title_activity_search">Pesquisa</string>
+    <string name="self_note">Minha nota</string>
+    <string name="title">Título</string>
+    <string name="description">Descrição</string>
+    <string name="notification">Notificação</string>
+    <string name="delete">Excluir</string>
+    <string name="save">Salve </string>
+    <string name="share">Compartilhar</string>
+    <string name="search">Pesquisa</string>
+    <string name="deleting">Excluir</string>
+    <string name="delete_note">Excluir nota</string>
+    <string name="notification_set">Conjunto de notificações</string>
+    <string name="note_created">Nota criada</string>
+    <string name="add_something_to_save">Adicione algo para salvar</string>
+    <string name="notification_updated">Notificação atualizada</string>
+    <string name="sure_you_want_to_delete">Claro que você deseja excluir?</string>
+</resources>
