@@ -18,4 +18,5 @@
     <string name="add_something_to_save">Ajouter quelque chose à sauver</string>
     <string name="notification_updated">Notification sont mis à jour</string>
     <string name="sure_you_want_to_delete">vous voulez supprimer?</string>
+    <string name="undo">annuler</string>
 </resources>

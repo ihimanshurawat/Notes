@@ -18,5 +18,6 @@
     <string name="notification_updated">अधिसूचना अद्यतन</string>
     <string name="app_name">Notes</string>
     <string name="sure_you_want_to_delete">निश्चित रूप से आप हटाना चाहते हैं?</string>
+    <string name="undo">पूर्ववत</string>
 
 </resources>

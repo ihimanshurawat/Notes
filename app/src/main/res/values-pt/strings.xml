@@ -18,4 +18,5 @@
     <string name="add_something_to_save">Adicione algo para salvar</string>
     <string name="notification_updated">Notificação atualizada</string>
     <string name="sure_you_want_to_delete">Claro que você deseja excluir?</string>
+    <string name="undo">desfazer</string>
 </resources>

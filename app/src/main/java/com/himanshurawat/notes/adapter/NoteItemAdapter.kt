@@ -19,10 +19,16 @@ import java.util.*
 class NoteItemAdapter(val context: Context,var noteList:List<NoteEntity>,var listener: OnItemClickListener):
         RecyclerView.Adapter<NoteItemAdapter.NoteViewHolder>() {
 
+    private var recentlyDeletedItem: NoteEntity? = null
+    private var recentlyDeletedItemPosition: Int = -1
+
+
     private val userPref: SharedPreferences = context.applicationContext.getSharedPreferences(Constant.USER_PREF,Context.MODE_PRIVATE)
 
     interface OnItemClickListener{
         fun onNoteSelected(noteId: Long)
+        fun onItemSwiped(note: NoteEntity)
+        fun showUndoSnackBar(note: NoteEntity?)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
@@ -173,6 +179,15 @@ class NoteItemAdapter(val context: Context,var noteList:List<NoteEntity>,var lis
         return ""
     }
 
+
+    fun deleteItem(position: Int){
+        recentlyDeletedItem = noteList[position]
+        recentlyDeletedItemPosition = position
+        notifyItemRemoved(position)
+        val note = noteList[position]
+        listener.onItemSwiped(note)
+        listener.showUndoSnackBar(recentlyDeletedItem)
+    }
 
 
 

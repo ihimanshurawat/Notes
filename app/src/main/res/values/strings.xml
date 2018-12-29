@@ -17,4 +17,5 @@
     <string name="add_something_to_save">Add Something to Save</string>
     <string name="notification_updated">Notification Updated</string>
     <string name="sure_you_want_to_delete">Sure you want to Delete?</string>
+    <string name="undo">Undo</string>
 </resources>

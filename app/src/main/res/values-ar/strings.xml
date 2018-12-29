@@ -18,4 +18,5 @@
     <string name="add_something_to_save">"أضف شيئًا للحفظ "</string>
     <string name="notification_updated">"الإخطار تحديث "</string>
     <string name="sure_you_want_to_delete">هل تريد حذف؟</string>
+    <string name="undo">إلغاء</string>
 </resources>

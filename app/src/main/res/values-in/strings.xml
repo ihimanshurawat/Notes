@@ -19,4 +19,5 @@
     <string name="add_something_to_save">Tambahkan Sesuatu untuk Disimpan</string>
     <string name="notification_updated">Pemberitahuan Diperbarui</string>
     <string name="sure_you_want_to_delete">Yakin ingin Hapus?</string>
+    <string name="undo">batalkan</string>
 </resources>
