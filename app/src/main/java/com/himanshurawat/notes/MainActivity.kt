@@ -1,19 +1,14 @@
 package com.himanshurawat.notes
-
-import android.Manifest
+ 
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -33,12 +28,6 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var noteViewModel: NoteViewModel
     private lateinit var userPref: SharedPreferences
-
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { _ ->
-        // Permission result handled
-    }
 
     override fun showUndoSnackBar(note: NoteEntity?) {
         val snackbar: Snackbar = Snackbar.make(binding.root, R.string.deleting, Snackbar.LENGTH_LONG)
@@ -89,20 +78,6 @@ class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
         )
         val itemTouchHelper = ItemTouchHelper(SwipeDeleteCallback(noteAdapter))
         itemTouchHelper.attachToRecyclerView(binding.contentMainLayout.noteRecyclerView)
-
-        requestNotificationPermission()
-    }
-
-    private fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

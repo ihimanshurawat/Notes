@@ -18,4 +18,9 @@
     <string name="notification_updated">Notification Updated</string>
     <string name="sure_you_want_to_delete">Sure you want to Delete?</string>
     <string name="undo">Undo</string>
+    <string name="notification_permission_title">Note Reminders</string>
+    <string name="notification_permission_message">Allow Notes to send notifications so you receive alerts when your scheduled note reminders are due.</string>
+    <string name="notification_permission_continue">Continue</string>
+    <string name="notification_permission_not_now">Not Now</string>
+    <string name="notification_permission_denied">Notifications are disabled. Reminder alerts won\'t appear.</string>
 </resources>

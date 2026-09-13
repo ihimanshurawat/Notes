@@ -1,5 +1,6 @@
 package com.himanshurawat.notes.activity
 
+import android.Manifest
 import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
@@ -7,9 +8,12 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.text.format.DateFormat
 import android.view.Menu
 import android.view.MenuItem
@@ -17,8 +21,10 @@ import android.view.View
 import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -43,6 +49,31 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
     private lateinit var title: String
     private lateinit var description: String
     private lateinit var userPref: SharedPreferences
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            showDatePicker()
+        } else {
+            val snackbar = Snackbar.make(
+                binding.activityAddNoteRoot,
+                R.string.notification_permission_denied,
+                Snackbar.LENGTH_LONG
+            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                !ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)
+            ) {
+                snackbar.setAction(R.string.action_settings) {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", packageName, null)
+                    }
+                    startActivity(intent)
+                }
+            }
+            snackbar.show()
+        }
+    }
 
     // Notification Variables
     private var yy: Int = 0
@@ -141,6 +172,9 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         binding.activityAddNoteNotificationChip.setOnCloseIconClickListener {
             removeChip()
         }
+        binding.activityAddNoteNotificationChip.setOnClickListener {
+            checkNotificationPermissionAndShowPicker()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -180,7 +214,7 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
                     .show()
             }
             R.id.add_note_menu_notification -> {
-                showDatePicker()
+                checkNotificationPermissionAndShowPicker()
             }
             R.id.add_note_menu_share -> {
                 val shareIntent = Intent(Intent.ACTION_SEND).apply {
@@ -346,6 +380,37 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         val calendar: Calendar = Calendar.getInstance()
         calendar.set(year, month, day, hour, min, 0)
         return calendar.timeInMillis
+    }
+
+    private fun checkNotificationPermissionAndShowPicker() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    showDatePicker()
+                }
+                else -> {
+                    showNotificationExplainerDialog()
+                }
+            }
+        } else {
+            showDatePicker()
+        }
+    }
+
+    private fun showNotificationExplainerDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.notification_permission_title)
+            .setMessage(R.string.notification_permission_message)
+            .setPositiveButton(R.string.notification_permission_continue) { _, _ ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+            .setNegativeButton(R.string.notification_permission_not_now, null)
+            .show()
     }
 
     private fun showDatePicker() {
