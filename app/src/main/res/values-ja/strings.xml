@@ -20,4 +20,9 @@
     <string name="notification_updated">通知の更新</string>
     <string name="sure_you_want_to_delete">削除しますか？</string>
     <string name="undo">アンドゥ</string>
+    <string name="notification_permission_title">メモのリマインダー</string>
+    <string name="notification_permission_message">スケジュールされたメモのリマインダー通知を受け取るために、Notesに通知の送信を許可してください。</string>
+    <string name="notification_permission_continue">続行</string>
+    <string name="notification_permission_not_now">後で</string>
+    <string name="notification_permission_denied">通知が無効になっています。リマインダー通知は表示されません。</string>
 </resources>

@@ -19,5 +19,9 @@
     <string name="app_name">Notes</string>
     <string name="sure_you_want_to_delete">निश्चित रूप से आप हटाना चाहते हैं?</string>
     <string name="undo">पूर्ववत</string>
-
+    <string name="notification_permission_title">नोट रिमाइंडर</string>
+    <string name="notification_permission_message">Notes को सूचनाएं (नोटिफिकेशन) भेजने की अनुमति दें ताकि आपके निर्धारित नोट रिमाइंडर समय पर आपको मिल सकें।</string>
+    <string name="notification_permission_continue">जारी रखें</string>
+    <string name="notification_permission_not_now">अभी नहीं</string>
+    <string name="notification_permission_denied">सूचनाएं अक्षम हैं। रिमाइंडर अलर्ट दिखाई नहीं देंगे।</string>
 </resources>

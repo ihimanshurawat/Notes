@@ -19,4 +19,9 @@
     <string name="notification_updated">Notification sont mis à jour</string>
     <string name="sure_you_want_to_delete">vous voulez supprimer?</string>
     <string name="undo">annuler</string>
+    <string name="notification_permission_title">Rappels de notes</string>
+    <string name="notification_permission_message">Autorisez Notes à envoyer des notifications afin de recevoir des alertes pour vos rappels de notes programmés.</string>
+    <string name="notification_permission_continue">Continuer</string>
+    <string name="notification_permission_not_now">Pas maintenant</string>
+    <string name="notification_permission_denied">Les notifications sont désactivées. Les alertes de rappel n\'apparaîtront pas.</string>
 </resources>

@@ -19,4 +19,9 @@
     <string name="notification_updated">"الإخطار تحديث "</string>
     <string name="sure_you_want_to_delete">هل تريد حذف؟</string>
     <string name="undo">إلغاء</string>
+    <string name="notification_permission_title">تذكيرات الملاحظات</string>
+    <string name="notification_permission_message">اسمح لتطبيق Notes بإرسال الإشعارات لتصلك تنبيهات عند حلول موعد تذكيرات ملاحظاتك المجدولة.</string>
+    <string name="notification_permission_continue">متابعة</string>
+    <string name="notification_permission_not_now">ليس الآن</string>
+    <string name="notification_permission_denied">الإشعارات معطلة. لن تظهر تنبيهات التذكير.</string>
 </resources>

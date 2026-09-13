@@ -20,4 +20,9 @@
     <string name="notification_updated">Pemberitahuan Diperbarui</string>
     <string name="sure_you_want_to_delete">Yakin ingin Hapus?</string>
     <string name="undo">batalkan</string>
+    <string name="notification_permission_title">Pengingat Catatan</string>
+    <string name="notification_permission_message">Izinkan Notes mengirim pemberitahuan agar Anda menerima peringatan saat pengingat catatan terjadwal tiba waktunya.</string>
+    <string name="notification_permission_continue">Lanjutkan</string>
+    <string name="notification_permission_not_now">Nanti Saja</string>
+    <string name="notification_permission_denied">Pemberitahuan dinonaktifkan. Peringatan pengingat tidak akan muncul.</string>
 </resources>

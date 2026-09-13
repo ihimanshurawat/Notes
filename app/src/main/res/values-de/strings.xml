@@ -19,8 +19,9 @@
     <string name="notification_updated">Benachrichtigung aktualisiert</string>
     <string name="sure_you_want_to_delete">Sicher möchtest du löschen?</string>
     <string name="undo">rückgängig machen</string>
-
-    Sicher möchtest du löschen?
-
-
+    <string name="notification_permission_title">Notiz-Erinnerungen</string>
+    <string name="notification_permission_message">Erlaube Notes das Senden von Benachrichtigungen, damit du Erinnerungen an deine geplanten Notizen erhältst.</string>
+    <string name="notification_permission_continue">Weiter</string>
+    <string name="notification_permission_not_now">Nicht jetzt</string>
+    <string name="notification_permission_denied">Benachrichtigungen sind deaktiviert. Erinnerungsbenachrichtigungen werden nicht angezeigt.</string>
 </resources>
