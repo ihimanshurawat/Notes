@@ -5,65 +5,66 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
+import android.os.Build
 import com.himanshurawat.notes.db.NoteDatabase
-import com.himanshurawat.notes.db.entity.NoteEntity
 import com.himanshurawat.notes.utils.Constant
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.toast
-import org.jetbrains.anko.uiThread
-import java.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class RebootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        if (Intent.ACTION_BOOT_COMPLETED != intent.action) return
 
-            context.toast("Reboot Completed")
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val database = NoteDatabase.getInstance(context)
+        val pendingResult = goAsync()
 
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            doAsync {
-                val noteDatabase = NoteDatabase.getInstance(context)
-                val noteDao = noteDatabase.getNoteDao()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val noteDao = database.getNoteDao()
                 val notes = noteDao.getAllNotesForRebootReceiver()
-                uiThread {
-                    for(note in notes){
-                        if(note.isNotificationSet){
+                val currentTime = System.currentTimeMillis()
 
-                            val noteIntent = Intent(context.applicationContext
-                                    ,NotificationReceiver::class.java)
+                val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                } else {
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                }
 
-                            noteIntent.putExtra(Constant.NOTE_ID,note.id)
+                for (note in notes) {
+                    if (note.isNotificationSet && note.notification > currentTime) {
+                        val noteIntent = Intent(context.applicationContext, NotificationReceiver::class.java).apply {
+                            putExtra(Constant.NOTE_ID, note.id)
+                        }
 
-                            val notePendingIntent = PendingIntent.getBroadcast(context.applicationContext
-                                    ,note.id.toInt()
-                                    ,noteIntent,PendingIntent.FLAG_UPDATE_CURRENT)
-                            val calendar = Calendar.getInstance()
-                            calendar.timeInMillis = note.notification
+                        val notePendingIntent = PendingIntent.getBroadcast(
+                            context.applicationContext,
+                            note.id.toInt(),
+                            noteIntent,
+                            flags
+                        )
 
-                            val yy = calendar.get(Calendar.YEAR)
-                            val mm = calendar.get(Calendar.MONTH)
-                            val dd = calendar.get(Calendar.DATE)
-                            val hh = calendar.get(Calendar.HOUR_OF_DAY)
-                            val mn = calendar.get(Calendar.MINUTE)
-
-                            alarmManager.set(AlarmManager.RTC
-                                    ,getNotificationTime(yy,mm,dd,hh,mn)
-                                    ,notePendingIntent)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            alarmManager.setExactAndAllowWhileIdle(
+                                AlarmManager.RTC_WAKEUP,
+                                note.notification,
+                                notePendingIntent
+                            )
+                        } else {
+                            alarmManager.set(
+                                AlarmManager.RTC_WAKEUP,
+                                note.notification,
+                                notePendingIntent
+                            )
                         }
                     }
                 }
+            } finally {
+                pendingResult.finish()
             }
-
-
-
+        }
     }
-
-
-    private fun getNotificationTime(year: Int,month: Int,day: Int, hour: Int,min: Int): Long{
-        val calendar: Calendar = Calendar.getInstance()
-        calendar.set(year,month,day,hour,min)
-        return calendar.timeInMillis
-    }
-
-
 }
+

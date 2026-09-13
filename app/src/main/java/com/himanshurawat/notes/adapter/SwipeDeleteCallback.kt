@@ -4,11 +4,10 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.himanshurawat.notes.R
-import android.opengl.ETC1.getHeight
 
 
 
@@ -26,8 +25,10 @@ class SwipeDeleteCallback(private val adapter: NoteItemAdapter):
     }
 
     override fun onSwiped(viewholder: RecyclerView.ViewHolder, p1: Int) {
-        val position = viewholder.adapterPosition
-        adapter.deleteItem(position)
+        val position = viewholder.bindingAdapterPosition
+        if (position != RecyclerView.NO_POSITION) {
+            adapter.deleteItem(position)
+        }
     }
 
     override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {

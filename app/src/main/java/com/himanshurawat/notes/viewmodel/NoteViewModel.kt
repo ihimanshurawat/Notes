@@ -1,63 +1,52 @@
 package com.himanshurawat.notes.viewmodel
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.himanshurawat.notes.db.NoteDatabase
 import com.himanshurawat.notes.db.entity.NoteEntity
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
+class NoteViewModel(application: Application) : AndroidViewModel(application) {
 
-class NoteViewModel constructor(application: Application):AndroidViewModel(application){
+    // Database Reference
+    private val database: NoteDatabase = NoteDatabase.getInstance(getApplication())
 
-
-    //Database Reference
-    private val database:NoteDatabase = NoteDatabase.getInstance(this.getApplication())
-
-    //ViewModel Function to Fetch All Data
+    // ViewModel Function to Fetch All Data
     fun getNotes(): LiveData<List<NoteEntity>> {
-
         return database.getNoteDao().allNotes()
     }
 
-    //Function to Add Note to Database
-    fun addNote(note: NoteEntity): MutableLiveData<Long> {
-        var noteId: MutableLiveData<Long> = MutableLiveData()
-        //Using Anko for Async Operations
-        doAsync {
+    // Function to Add Note to Database
+    fun addNote(note: NoteEntity): LiveData<Long> {
+        val noteId = MutableLiveData<Long>()
+        viewModelScope.launch(Dispatchers.IO) {
             val id = database.getNoteDao().addNote(note)
-            uiThread {
-                noteId.value = id
-            }
+            noteId.postValue(id)
         }
-
         return noteId
     }
 
-    //Deleting a Note from Database
-    fun deleteNote(note: NoteEntity){
-
-        doAsync {
+    // Deleting a Note from Database
+    fun deleteNote(note: NoteEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
             database.getNoteDao().deleteNote(note)
         }
-
     }
 
-    //Get Note By id
-    fun getNoteById(id: Long):LiveData<NoteEntity>{
-
+    // Get Note By id
+    fun getNoteById(id: Long): LiveData<NoteEntity> {
         return database.getNoteDao().getNoteById(id)
     }
 
-    //Update Note
-    fun updateNote(note: NoteEntity){
-        doAsync {
+    // Update Note
+    fun updateNote(note: NoteEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
             database.getNoteDao().updateNote(note)
         }
     }
-
-
 }
 

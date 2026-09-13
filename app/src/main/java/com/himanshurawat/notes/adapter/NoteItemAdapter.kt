@@ -2,8 +2,8 @@ package com.himanshurawat.notes.adapter
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.RecyclerView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,7 +41,9 @@ class NoteItemAdapter(val context: Context,var noteList:List<NoteEntity>,var lis
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        val note:NoteEntity? = noteList[holder.adapterPosition]
+        val pos = holder.bindingAdapterPosition
+        if (pos == RecyclerView.NO_POSITION || pos >= noteList.size) return
+        val note: NoteEntity? = noteList[pos]
         if(note != null){
             holder.titleText.text = note.title
             holder.descriptionText.text = note.description
@@ -180,13 +182,14 @@ class NoteItemAdapter(val context: Context,var noteList:List<NoteEntity>,var lis
     }
 
 
-    fun deleteItem(position: Int){
-        recentlyDeletedItem = noteList[position]
-        recentlyDeletedItemPosition = position
-        notifyItemRemoved(position)
-        val note = noteList[position]
-        listener.onItemSwiped(note)
-        listener.showUndoSnackBar(recentlyDeletedItem)
+    fun deleteItem(position: Int) {
+        if (position in noteList.indices) {
+            recentlyDeletedItem = noteList[position]
+            recentlyDeletedItemPosition = position
+            val note = noteList[position]
+            listener.onItemSwiped(note)
+            listener.showUndoSnackBar(recentlyDeletedItem)
+        }
     }
 
 

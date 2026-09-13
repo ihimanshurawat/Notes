@@ -1,133 +1,132 @@
 package com.himanshurawat.notes
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.ColorStateList
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.format.DateFormat
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.google.firebase.analytics.FirebaseAnalytics
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.himanshurawat.notes.activity.AddNote
 import com.himanshurawat.notes.activity.Search
 import com.himanshurawat.notes.adapter.NoteItemAdapter
 import com.himanshurawat.notes.adapter.SwipeDeleteCallback
+import com.himanshurawat.notes.databinding.ActivityMainBinding
 import com.himanshurawat.notes.db.entity.NoteEntity
 import com.himanshurawat.notes.utils.Constant
 import com.himanshurawat.notes.viewmodel.NoteViewModel
 
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_main.*
-
-
-
-private lateinit var noteViewModel: NoteViewModel
-
-private lateinit var userPref: SharedPreferences
-
-private lateinit var firebaseAnalytics: FirebaseAnalytics
-
 class MainActivity : AppCompatActivity(), NoteItemAdapter.OnItemClickListener {
 
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var noteViewModel: NoteViewModel
+    private lateinit var userPref: SharedPreferences
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { _ ->
+        // Permission result handled
+    }
+
     override fun showUndoSnackBar(note: NoteEntity?) {
-        val snackbar: Snackbar = Snackbar.make(activity_main_root,R.string.deleting,Snackbar.LENGTH_LONG)
+        val snackbar: Snackbar = Snackbar.make(binding.root, R.string.deleting, Snackbar.LENGTH_LONG)
         snackbar.setAction(R.string.undo) {
-            if(note != null) {
+            if (note != null) {
                 noteViewModel.addNote(note)
             }
         }
         snackbar.show()
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
         userPref = application.getSharedPreferences(Constant.USER_PREF, Context.MODE_PRIVATE)
 
-        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
-
-        //Check Whether User Uses 24H format
+        // Check Whether User Uses 24H format
         val is24H = DateFormat.is24HourFormat(applicationContext)
-        userPref.edit().putBoolean(Constant.IS_24_HOUR_FORMAT,is24H).apply()
+        userPref.edit().putBoolean(Constant.IS_24_HOUR_FORMAT, is24H).apply()
 
-
-
-        fab.setOnClickListener { _ ->
-
-            firebaseAnalytics.logEvent(Constant.ADD_NOTE,null)
-
-            startActivity(Intent(this,AddNote::class.java))
+        binding.fab.setOnClickListener {
+            startActivity(Intent(this, AddNote::class.java))
         }
 
-        noteViewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
-        val noteAdapter = NoteItemAdapter(this,arrayListOf(),this)
+        noteViewModel = ViewModelProvider(this)[NoteViewModel::class.java]
+        val noteAdapter = NoteItemAdapter(this, arrayListOf(), this)
 
-        noteViewModel.getNotes().observe(this, Observer { it->
-                if(it != null) {
-                    noteAdapter.addNotes(it)
-                    if(noteAdapter.itemCount>0){
-                        content_main_empty_notes_image_view.visibility = View.GONE
-                    }else{
-                        content_main_empty_notes_image_view.visibility = View.VISIBLE
-                    }
+        noteViewModel.getNotes().observe(this, Observer { notes ->
+            if (notes != null) {
+                noteAdapter.addNotes(notes)
+                if (noteAdapter.itemCount > 0) {
+                    binding.contentMainLayout.contentMainEmptyNotesImageView.visibility = View.GONE
+                } else {
+                    binding.contentMainLayout.contentMainEmptyNotesImageView.visibility = View.VISIBLE
                 }
+            }
         })
 
-        noteRecyclerView.adapter = noteAdapter
-        noteRecyclerView.layoutManager = LinearLayoutManager(this,
-                LinearLayoutManager.VERTICAL,false)
+        binding.contentMainLayout.noteRecyclerView.adapter = noteAdapter
+        binding.contentMainLayout.noteRecyclerView.layoutManager = LinearLayoutManager(
+            this,
+            LinearLayoutManager.VERTICAL,
+            false
+        )
         val itemTouchHelper = ItemTouchHelper(SwipeDeleteCallback(noteAdapter))
-        itemTouchHelper.attachToRecyclerView(noteRecyclerView)
+        itemTouchHelper.attachToRecyclerView(binding.contentMainLayout.noteRecyclerView)
 
+        requestNotificationPermission()
+    }
 
-
-
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        when(item.itemId){
-
-            R.id.search ->{
-
-                firebaseAnalytics.logEvent(Constant.SEARCH_ICON_CLICKED,null)
+        when (item.itemId) {
+            R.id.search -> {
                 startActivity(Intent(this@MainActivity, Search::class.java))
             }
         }
         return true
-
     }
 
     override fun onNoteSelected(noteId: Long) {
-        val intent = Intent(this,AddNote::class.java)
-        intent.putExtra(Constant.GET_NOTES,noteId)
+        val intent = Intent(this, AddNote::class.java)
+        intent.putExtra(Constant.GET_NOTES, noteId)
         startActivity(intent)
-
     }
 
     override fun onItemSwiped(note: NoteEntity) {
         noteViewModel.deleteNote(note)
     }
-
 }
+

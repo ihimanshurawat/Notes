@@ -4,77 +4,71 @@ import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
-import android.support.v7.app.AppCompatActivity
+import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.ActionBar
-import android.text.Editable
+import android.text.format.DateFormat
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
-import com.google.android.gms.actions.NoteIntents
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.himanshurawat.notes.viewmodel.NoteViewModel
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.himanshurawat.notes.R
+import com.himanshurawat.notes.databinding.ActivityAddNoteBinding
 import com.himanshurawat.notes.db.entity.NoteEntity
 import com.himanshurawat.notes.receiver.NotificationReceiver
 import com.himanshurawat.notes.utils.Constant
 import com.himanshurawat.notes.viewmodel.AddNoteViewModel
-import kotlinx.android.synthetic.main.activity_add_note.*
-import org.jetbrains.anko.*
+import com.himanshurawat.notes.viewmodel.NoteViewModel
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.min
 
 class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
-
-    //Lateinits
+    private lateinit var binding: ActivityAddNoteBinding
     private lateinit var viewModel: NoteViewModel
     private lateinit var addNoteViewModel: AddNoteViewModel
     private lateinit var noteEntity: NoteEntity
     private lateinit var title: String
     private lateinit var description: String
     private lateinit var userPref: SharedPreferences
-    private lateinit var firebaseAnalytics: FirebaseAnalytics
 
-    //Variables
-    //Notification
+    // Notification Variables
     private var yy: Int = 0
     private var mm: Int = 0
     private var dd: Int = 0
     private var hh: Int = 0
     private var mn: Int = 0
-    //Note Id
-    private var noteId:Long = -1L
 
-    //Flags
+    // Note Id
+    private var noteId: Long = -1L
+
+    // Flags
     private var isNotificationSet = false
     private var noteEntityInitialized = false
     private var isDeleting = false
 
-
-    //Observers
-    private val observer:Observer<NoteEntity?> = Observer {
+    // Observers
+    private val observer: Observer<NoteEntity?> = Observer {
         if (it != null) {
-
             addNoteViewModel.setTitle(it.title)
             addNoteViewModel.setDescription(it.description)
             noteEntity = it
             noteEntityInitialized = true
             isNotificationSet = noteEntity.isNotificationSet
-            if(isNotificationSet){
-                val calendar:Calendar = Calendar.getInstance()
+            if (isNotificationSet) {
+                val calendar: Calendar = Calendar.getInstance()
                 calendar.timeInMillis = noteEntity.notification
                 yy = calendar.get(Calendar.YEAR)
                 mm = calendar.get(Calendar.MONTH)
@@ -87,7 +81,7 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
     }
 
     private val noteIdObserver: Observer<Long?> = Observer {
-        if(it != null){
+        if (it != null) {
             noteId = it
             viewModel.getNoteById(noteId).observe(this, observer)
             addNoteViewModel.isFilled = true
@@ -95,388 +89,325 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         }
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_note)
-        setSupportActionBar(activity_add_note_toolbar)
+        binding = ActivityAddNoteBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.activityAddNoteToolbar)
 
-        //Setting Title and Enabling Home Up
+        // Setting Title and Enabling Home Up
         val ab: ActionBar? = supportActionBar
         ab?.title = ""
         ab?.setHomeButtonEnabled(true)
         ab?.setDisplayHomeAsUpEnabled(true)
 
-        userPref = application.getSharedPreferences(Constant.USER_PREF,Context.MODE_PRIVATE)
+        userPref = application.getSharedPreferences(Constant.USER_PREF, Context.MODE_PRIVATE)
 
-        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
+        // View Model
+        viewModel = ViewModelProvider(this)[NoteViewModel::class.java]
+        addNoteViewModel = ViewModelProvider(this)[AddNoteViewModel::class.java]
 
-        //View Model
-        viewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
-        addNoteViewModel = ViewModelProviders.of(this).get(AddNoteViewModel::class.java)
-
-        if(Intent.ACTION_SEND.equals(intent.action) && intent.type != null){
-            addNoteViewModel.setDescription(intent.getStringExtra(Intent.EXTRA_TEXT))
-        }else if(NoteIntents.ACTION_CREATE_NOTE.equals(intent.action)&& intent.type != null){
-            if(intent.extras !=null) {
-
+        if (Intent.ACTION_SEND == intent.action && intent.type != null) {
+            addNoteViewModel.setDescription(intent.getStringExtra(Intent.EXTRA_TEXT) ?: "")
+        } else if ("com.google.android.gms.actions.CREATE_NOTE" == intent.action && intent.type != null) {
+            if (intent.extras != null) {
                 addNoteViewModel.setTitle(resources.getString(R.string.self_note))
-
                 if (intent.hasExtra(Intent.EXTRA_TEXT)) {
-                    addNoteViewModel.setDescription(intent.getStringExtra(Intent.EXTRA_TEXT))
+                    addNoteViewModel.setDescription(intent.getStringExtra(Intent.EXTRA_TEXT) ?: "")
                 }
-
             }
         }
-        noteId = intent.getLongExtra(Constant.GET_NOTES,-1L)
+        noteId = intent.getLongExtra(Constant.GET_NOTES, -1L)
 
-
-
-        if(!addNoteViewModel.isFilled){
-            if(intent.hasExtra(Constant.GET_NOTES)){
+        if (!addNoteViewModel.isFilled) {
+            if (intent.hasExtra(Constant.GET_NOTES)) {
                 viewModel.getNoteById(noteId).observe(this, observer)
                 addNoteViewModel.isFilled = true
             }
         }
 
-
-        //Persist Data when Configuration Changes
+        // Persist Data when Configuration Changes
         addNoteViewModel.title.observe(this, Observer { text ->
-            activity_add_note_title_edit_text.setText(text)
+            if (binding.activityAddNoteTitleEditText.text.toString() != text) {
+                binding.activityAddNoteTitleEditText.setText(text)
+            }
         })
         addNoteViewModel.description.observe(this, Observer { text ->
-            activity_add_note_description_edit_text.setText(text)
+            if (binding.activityAddNoteDescriptionEditText.text.toString() != text) {
+                binding.activityAddNoteDescriptionEditText.setText(text)
+            }
         })
 
-
-        activity_add_note_notification_chip_view.setOnDeleteClicked {
+        binding.activityAddNoteNotificationChip.setOnCloseIconClickListener {
             removeChip()
         }
-
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
-        menuInflater.inflate(R.menu.add_note_menu,menu)
-
+        menuInflater.inflate(R.menu.add_note_menu, menu)
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem):Boolean{
-
-        when(item.itemId){
-            R.id.add_note_menu_save ->{
-                if(noteId == -1L) {
-                    //Setting NoteId to 0 to Auto Increment
-
-                    if(updateDatabase()) {
-                        //Note Created Snackbar
-                        displaySnackbar(activity_add_note_root, getString(R.string.note_created))
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+            R.id.add_note_menu_save -> {
+                if (noteId == -1L) {
+                    if (updateDatabase()) {
+                        displaySnackbar(binding.activityAddNoteRoot, getString(R.string.note_created))
                     }
-                    //Snackbar.make(activity_add_note_root,"Note Created", Snackbar.LENGTH_SHORT).show()
-                   //displayToast("Note Created")
                 }
             }
-            R.id.add_note_menu_delete ->{
-
-                firebaseAnalytics.logEvent(Constant.DELETE_ICON_CLICKED,null)
-
-                //Alert Before Delete Using Anko
-                alert(getString(R.string.sure_you_want_to_delete)) {
-                    title = getString(R.string.delete_note)
-                    yesButton {
-                        viewModel.deleteNote(noteEntity)
-                        //Deleting Snackbar
+            R.id.add_note_menu_delete -> {
+                MaterialAlertDialogBuilder(this)
+                    .setTitle(getString(R.string.delete_note))
+                    .setMessage(getString(R.string.sure_you_want_to_delete))
+                    .setPositiveButton(getString(R.string.delete)) { _, _ ->
+                        if (::noteEntity.isInitialized) {
+                            viewModel.deleteNote(noteEntity)
+                        }
                         displayToast(getString(R.string.deleting))
-                        //displayToast(getString(R.string.deleting))
                         isDeleting = true
-                        if(isNotificationSet){
+                        if (isNotificationSet) {
                             deleteNotification()
                         }
-                        firebaseAnalytics.logEvent(Constant.DELETE_CONFIRMED,null)
                         finish()
                     }
-                    noButton {
-                        firebaseAnalytics.logEvent(Constant.DELETE_CANCELLED,null)
-                    }
-                }.show()
-
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
             }
-            R.id.add_note_menu_notification ->{
-                firebaseAnalytics.logEvent(Constant.ALARM_ICON_CLICKED,null)
-
+            R.id.add_note_menu_notification -> {
                 showDatePicker()
             }
-            R.id.add_note_menu_share ->{
-                val shareIntent = Intent()
-                shareIntent.action = Intent.ACTION_SEND
-                shareIntent.putExtra(Intent.EXTRA_TEXT,getSharedString(activity_add_note_title_edit_text.text.trim().toString()
-                        ,activity_add_note_description_edit_text.text.trim().toString()))
-                shareIntent.type = "text/plain"
-                startActivity(shareIntent)
+            R.id.add_note_menu_share -> {
+                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(
+                        Intent.EXTRA_TEXT,
+                        getSharedString(
+                            binding.activityAddNoteTitleEditText.text.toString().trim(),
+                            binding.activityAddNoteDescriptionEditText.text.toString().trim()
+                        )
+                    )
+                }
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.share)))
             }
-
         }
         return super.onOptionsItemSelected(item)
     }
 
-    //Hide Delete From Menu If It's New Note
+    // Hide Delete From Menu If It's New Note
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         super.onPrepareOptionsMenu(menu)
-        if(noteId == -1L){
-            menu.findItem(R.id.add_note_menu_delete).isVisible = false
-            menu.findItem(R.id.add_note_menu_notification).isVisible = false
-            menu.findItem(R.id.add_note_menu_share).isVisible = false
-            menu.findItem(R.id.add_note_menu_save).isVisible = true
-        }else{
-            menu.findItem(R.id.add_note_menu_delete).isVisible = true
-            menu.findItem(R.id.add_note_menu_notification).isVisible = true
-            menu.findItem(R.id.add_note_menu_share).isVisible = true
-            menu.findItem(R.id.add_note_menu_save).isVisible = false
+        if (noteId == -1L) {
+            menu.findItem(R.id.add_note_menu_delete)?.isVisible = false
+            menu.findItem(R.id.add_note_menu_notification)?.isVisible = false
+            menu.findItem(R.id.add_note_menu_share)?.isVisible = false
+            menu.findItem(R.id.add_note_menu_save)?.isVisible = true
+        } else {
+            menu.findItem(R.id.add_note_menu_delete)?.isVisible = true
+            menu.findItem(R.id.add_note_menu_notification)?.isVisible = true
+            menu.findItem(R.id.add_note_menu_share)?.isVisible = true
+            menu.findItem(R.id.add_note_menu_save)?.isVisible = false
         }
         return true
     }
 
-
-
     override fun onStop() {
         super.onStop()
-        if(noteId != -1L && !isDeleting){
+        if (noteId != -1L && !isDeleting) {
             updateDatabase()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if(!isDeleting) {
-            title = activity_add_note_title_edit_text.text.trim().toString()
-            description = activity_add_note_description_edit_text.text.trim().toString()
+        if (!isDeleting) {
+            title = binding.activityAddNoteTitleEditText.text.toString().trim()
+            description = binding.activityAddNoteDescriptionEditText.text.toString().trim()
             if (intent.hasExtra(Constant.GET_NOTES)) {
-                viewModel.getNoteById(noteId).removeObserver { observer }
+                viewModel.getNoteById(noteId).removeObserver(observer)
             }
-
             addNoteViewModel.setTitle(title)
             addNoteViewModel.setDescription(description)
         }
-
     }
 
+    private fun updateDatabase(): Boolean {
+        title = binding.activityAddNoteTitleEditText.text.toString().trim()
+        description = binding.activityAddNoteDescriptionEditText.text.toString().trim()
 
-    private fun updateDatabase():Boolean{
-
-        title = activity_add_note_title_edit_text.text.trim().toString()
-        description = activity_add_note_description_edit_text.text.trim().toString()
-
-        //When Title is Empty but Description Isn't
-        if (title == "" && description != "") {
-
-            if(noteId == -1L){
+        if (title.isEmpty() && description.isNotEmpty()) {
+            if (noteId == -1L) {
                 noteId = 0
             }
-
-
-            //NoteEntity Object
             val preTitle = description.split(" ")
-
-            val note: NoteEntity = if(isNotificationSet){
-                NoteEntity(noteId,preTitle[0]
-                        ,description
-                        ,if(noteEntityInitialized)noteEntity.date else getSystemTimeInMillis()
-                        ,getNotificationTime(yy,mm,dd,hh,mn)
-                        ,isNotificationSet)
-            }else{
-                NoteEntity(noteId
-                        ,preTitle[0]
-                        ,description
-                        ,if(noteEntityInitialized)noteEntity.date else getSystemTimeInMillis())
+            val note: NoteEntity = if (isNotificationSet) {
+                NoteEntity(
+                    noteId,
+                    preTitle[0],
+                    description,
+                    if (noteEntityInitialized) noteEntity.date else getSystemTimeInMillis(),
+                    getNotificationTime(yy, mm, dd, hh, mn),
+                    isNotificationSet
+                )
+            } else {
+                NoteEntity(
+                    noteId,
+                    preTitle[0],
+                    description,
+                    if (noteEntityInitialized) noteEntity.date else getSystemTimeInMillis()
+                )
             }
-
-
-
-
-            viewModel.addNote(note).observe(this,noteIdObserver)
-
-            firebaseAnalytics.logEvent(Constant.SAVING_ONLY_DESCRIPTION_NOTE,null)
-
+            viewModel.addNote(note).observe(this, noteIdObserver)
             return true
-
-            //When Title and Description are not Empty
-        } else if (title != "" || description != "") {
-
-            if(noteId == -1L){
+        } else if (title.isNotEmpty() || description.isNotEmpty()) {
+            if (noteId == -1L) {
                 noteId = 0
             }
-
-            val note:NoteEntity = if(isNotificationSet){
-                NoteEntity(noteId
-                        ,title
-                        ,description
-                        ,if(noteEntityInitialized)noteEntity.date else getSystemTimeInMillis()
-                        ,getNotificationTime(yy,mm,dd,hh,mn)
-                        ,isNotificationSet)
-            }else{
-                NoteEntity(noteId
-                        ,title
-                        ,description
-                        ,if(noteEntityInitialized)noteEntity.date else getSystemTimeInMillis())
+            val note: NoteEntity = if (isNotificationSet) {
+                NoteEntity(
+                    noteId,
+                    title,
+                    description,
+                    if (noteEntityInitialized) noteEntity.date else getSystemTimeInMillis(),
+                    getNotificationTime(yy, mm, dd, hh, mn),
+                    isNotificationSet
+                )
+            } else {
+                NoteEntity(
+                    noteId,
+                    title,
+                    description,
+                    if (noteEntityInitialized) noteEntity.date else getSystemTimeInMillis()
+                )
             }
-
-            viewModel.addNote(note).observe(this,noteIdObserver)
-
-            firebaseAnalytics.logEvent(Constant.SAVING_COMPLETE_NOTE,null)
-
+            viewModel.addNote(note).observe(this, noteIdObserver)
             return true
-
-            //When Title is Not Empty
-        } else if (title != "" && description == "") {
-
-            if(noteId == -1L){
-                noteId = 0
-            }
-
-            val note:NoteEntity = if(isNotificationSet){
-                NoteEntity(noteId
-                        ,title
-                        ,""
-                        ,if(noteEntityInitialized)noteEntity.date else getSystemTimeInMillis()
-                        ,getNotificationTime(yy,mm,dd,hh,mn)
-                        ,isNotificationSet)
-            }else{
-                NoteEntity(noteId
-                        ,title
-                        ,""
-                        ,if(noteEntityInitialized)noteEntity.date else getSystemTimeInMillis())
-            }
-
-            viewModel.addNote(note).observe(this,noteIdObserver)
-
-            firebaseAnalytics.logEvent(Constant.SAVING_ONLY_TITLE_NOTE,null)
-
-            return true
-
-        }
-
-        //When Title and Description are Empty
-        else {
-            //Add Something to Save Snackbar
-            displaySnackbar(activity_add_note_root,getString(R.string.add_something_to_save))
-            firebaseAnalytics.logEvent(Constant.SAVING_EMPTY_NOTE,null)
-            //displayToast("Add Something to Save")
+        } else {
+            displaySnackbar(binding.activityAddNoteRoot, getString(R.string.add_something_to_save))
         }
         return false
     }
 
-    private fun displayToast(string: String){
-        toast(string)
-        val bundle = Bundle()
-        bundle.putString(Constant.TOAST_STRING,string)
-        firebaseAnalytics.logEvent(Constant.DISPLAY_TOAST,bundle)
+    private fun displayToast(string: String) {
+        Toast.makeText(this, string, Toast.LENGTH_SHORT).show()
     }
 
-    private fun getSystemTimeInMillis(): Long{
+    private fun getSystemTimeInMillis(): Long {
         return System.currentTimeMillis()
     }
 
-    private fun setNotification(){
-        val alarmManager: AlarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(applicationContext,NotificationReceiver::class.java)
-        intent.putExtra(Constant.NOTE_ID,noteId)
-        val pendingIntent = PendingIntent.getBroadcast(applicationContext,noteId.toInt(),intent,PendingIntent.FLAG_UPDATE_CURRENT)
-        alarmManager.set(AlarmManager.RTC,getNotificationTime(yy,mm,dd,hh,mn),pendingIntent)
+    private fun getPendingIntentFlags(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
     }
 
-    private fun deleteNotification(){
+    private fun setNotification() {
         val alarmManager: AlarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(applicationContext,NotificationReceiver::class.java)
-        intent.putExtra(Constant.NOTE_ID,noteId)
-        val pendingIntent = PendingIntent.getBroadcast(applicationContext,noteId.toInt(),intent,PendingIntent.FLAG_UPDATE_CURRENT)
+        val intent = Intent(applicationContext, NotificationReceiver::class.java).apply {
+            putExtra(Constant.NOTE_ID, noteId)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            noteId.toInt(),
+            intent,
+            getPendingIntentFlags()
+        )
+        val triggerTime = getNotificationTime(yy, mm, dd, hh, mn)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+        }
+    }
+
+    private fun deleteNotification() {
+        val alarmManager: AlarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(applicationContext, NotificationReceiver::class.java).apply {
+            putExtra(Constant.NOTE_ID, noteId)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            noteId.toInt(),
+            intent,
+            getPendingIntentFlags()
+        )
         alarmManager.cancel(pendingIntent)
-        firebaseAnalytics.logEvent(Constant.ALARM_CANCELLED,null)
     }
 
-    private fun getNotificationTime(year: Int,month: Int,day: Int, hour: Int,min: Int): Long{
+    private fun getNotificationTime(year: Int, month: Int, day: Int, hour: Int, min: Int): Long {
         val calendar: Calendar = Calendar.getInstance()
-        calendar.set(year,month,day,hour,min)
+        calendar.set(year, month, day, hour, min, 0)
         return calendar.timeInMillis
     }
 
-    private fun showDatePicker(){
+    private fun showDatePicker() {
         val year: Int
         val month: Int
         val day: Int
 
-
-        if(yy == 0) {
-            val calendar:Calendar = Calendar.getInstance()
+        if (yy == 0) {
+            val calendar: Calendar = Calendar.getInstance()
             year = calendar.get(Calendar.YEAR)
             month = calendar.get(Calendar.MONTH)
             day = calendar.get(Calendar.DAY_OF_MONTH)
-
-        }else{
+        } else {
             year = yy
             month = mm
             day = dd
         }
 
-        val datePickerDialog = DatePickerDialog(AddNote@ this,this,year,month,day)
-
+        val datePickerDialog = DatePickerDialog(this, this, year, month, day)
         datePickerDialog.show()
-
     }
 
-    private fun showTimePicker(){
-
-        val userPref:SharedPreferences = this.applicationContext.getSharedPreferences(Constant.USER_PREF,Context.MODE_PRIVATE)
-
-        val is24h = userPref.getBoolean(Constant.IS_24_HOUR_FORMAT,false)
-
+    private fun showTimePicker() {
+        val is24h = DateFormat.is24HourFormat(applicationContext)
         val hour: Int
         val minute: Int
-        if(hh == 0 || mm == 0){
+        if (hh == 0 && mn == 0) {
             val calendar: Calendar = Calendar.getInstance()
             hour = calendar.get(Calendar.HOUR_OF_DAY)
             minute = calendar.get(Calendar.MINUTE)
-        }else{
+        } else {
             hour = hh
             minute = mn
         }
 
-        val timePickerDialog: TimePickerDialog = TimePickerDialog(AddNote@this,this,hour,minute,is24h)
+        val timePickerDialog = TimePickerDialog(this, this, hour, minute, is24h)
         timePickerDialog.show()
-
     }
 
-
-    private fun createChip(){
-        activity_add_note_notification_chip_view.visibility = View.VISIBLE
-        val calendar:Calendar = Calendar.getInstance()
-        calendar.set(yy,mm,dd,hh,mn)
+    private fun createChip() {
+        binding.activityAddNoteNotificationChip.visibility = View.VISIBLE
+        val calendar: Calendar = Calendar.getInstance()
+        calendar.set(yy, mm, dd, hh, mn, 0)
         val currentTime = getSystemTimeInMillis()
         val notificationTime = calendar.timeInMillis
 
-        firebaseAnalytics.logEvent(Constant.CHIP_CREATED,null)
+        binding.activityAddNoteNotificationChip.text = getDateTime(notificationTime)
 
-        //Set Notification Only When Selected Time is ahead of Current Time
-        if(notificationTime > currentTime){
+        if (notificationTime > currentTime) {
             setNotification()
-            activity_add_note_notification_chip_view.label  = getDateTime(notificationTime)
-            activity_add_note_notification_chip_view.setLabelColor(ContextCompat.getColor(this,R.color.colorAccent))
-            activity_add_note_notification_chip_view.setDeleteIconColor(ContextCompat.getColor(this,R.color.colorAccent))
-            firebaseAnalytics.logEvent(Constant.CHIP_TIME_AHEAD,null)
-        }else{
-            activity_add_note_notification_chip_view.label  = getDateTime(notificationTime)
-            activity_add_note_notification_chip_view.setLabelColor(ContextCompat.getColor(this,R.color.colorDate))
-            activity_add_note_notification_chip_view.setDeleteIconColor(ContextCompat.getColor(this,R.color.colorDate))
-            firebaseAnalytics.logEvent(Constant.CHIP_TIME_BEHIND,null)
+            val accentColor = ContextCompat.getColor(this, R.color.colorAccent)
+            binding.activityAddNoteNotificationChip.setTextColor(accentColor)
+            binding.activityAddNoteNotificationChip.closeIconTint = ColorStateList.valueOf(accentColor)
+        } else {
+            val dateColor = ContextCompat.getColor(this, R.color.colorDate)
+            binding.activityAddNoteNotificationChip.setTextColor(dateColor)
+            binding.activityAddNoteNotificationChip.closeIconTint = ColorStateList.valueOf(dateColor)
         }
-
-
     }
 
-    private fun removeChip(){
-        activity_add_note_notification_chip_view.visibility = View.GONE
+    private fun removeChip() {
+        binding.activityAddNoteNotificationChip.visibility = View.GONE
         isNotificationSet = false
         deleteNotification()
         yy = 0
@@ -484,59 +415,36 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         dd = 0
         hh = 0
         mn = 0
-
-        firebaseAnalytics.logEvent(Constant.CHIP_CANCELLED,null)
     }
-
-
-
 
     override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
         hh = hourOfDay
         mn = minute
 
-        firebaseAnalytics.logEvent(Constant.ALARM_TIME_SET,null)
-
-        if(isNotificationSet){
+        if (isNotificationSet) {
             createChip()
-            //Notification Updated
-            displaySnackbar(activity_add_note_root,getString(R.string.notification_updated))
-
-            firebaseAnalytics.logEvent(Constant.ALARM_TIME_UPDATED,null)
-
-            //displayToast("Notification Updated")
-        }else if(!isNotificationSet){
+            displaySnackbar(binding.activityAddNoteRoot, getString(R.string.notification_updated))
+        } else {
             isNotificationSet = true
             createChip()
-            displaySnackbar(activity_add_note_root,getString(R.string.notification_set))
-
-            firebaseAnalytics.logEvent(Constant.ALARM_SET,null)
-
-            //displayToast(getString(R.string.notification_set))
+            displaySnackbar(binding.activityAddNoteRoot, getString(R.string.notification_set))
         }
-
     }
 
-    //onDateSetListener
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
         yy = year
         mm = month
         dd = dayOfMonth
-
-        firebaseAnalytics.logEvent(Constant.ALARM_DATE_SET,null)
-
         showTimePicker()
-
     }
 
-    //Returns Time String
-    private fun getDateTime(timeInMillis: Long):String {
+    private fun getDateTime(timeInMillis: Long): String {
         val now = Date(timeInMillis)
-        lateinit var dateFormatter: SimpleDateFormat
-        if(userPref.getBoolean(Constant.IS_24_HOUR_FORMAT,false)){
-            dateFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
-        }else {
-            dateFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        val is24h = DateFormat.is24HourFormat(applicationContext)
+        val dateFormatter = if (is24h) {
+            SimpleDateFormat("HH:mm", Locale.getDefault())
+        } else {
+            SimpleDateFormat("hh:mm a", Locale.getDefault())
         }
         val calendar: Calendar = Calendar.getInstance()
         calendar.timeInMillis = timeInMillis
@@ -547,68 +455,35 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
         return "$date ${getMonth(month)}, ${dateFormatter.format(now)}"
     }
 
-
-    private fun getMonth(month: Int): String{
-        when(month){
-            Calendar.JANUARY ->{
-                return "January"
-            }
-            Calendar.FEBRUARY ->{
-                return "February"
-            }
-            Calendar.MARCH ->{
-                return "March"
-            }
-            Calendar.APRIL ->{
-                return "April"
-            }
-            Calendar.MAY ->{
-                return "May"
-            }
-            Calendar.JUNE ->{
-                return "June"
-            }
-            Calendar.JULY ->{
-                return "July"
-            }
-            Calendar.AUGUST ->{
-                return "August"
-            }
-            Calendar.SEPTEMBER ->{
-                return "September"
-            }
-            Calendar.OCTOBER ->{
-                return "October"
-            }
-            Calendar.NOVEMBER ->{
-                return "November"
-            }
-            Calendar.DECEMBER ->{
-                return "December"
-            }
+    private fun getMonth(month: Int): String {
+        return when (month) {
+            Calendar.JANUARY -> "January"
+            Calendar.FEBRUARY -> "February"
+            Calendar.MARCH -> "March"
+            Calendar.APRIL -> "April"
+            Calendar.MAY -> "May"
+            Calendar.JUNE -> "June"
+            Calendar.JULY -> "July"
+            Calendar.AUGUST -> "August"
+            Calendar.SEPTEMBER -> "September"
+            Calendar.OCTOBER -> "October"
+            Calendar.NOVEMBER -> "November"
+            Calendar.DECEMBER -> "December"
+            else -> ""
         }
-        return ""
     }
 
-
-    private fun getSharedString(title: String, description: String): String{
-        if(title == "" && description != ""){
-            return description
-        }else if(title != "" && description == ""){
-            return title
-        }else if(title != "" && description != ""){
-            return "$title - $description"
+    private fun getSharedString(title: String, description: String): String {
+        return when {
+            title.isEmpty() && description.isNotEmpty() -> description
+            title.isNotEmpty() && description.isEmpty() -> title
+            title.isNotEmpty() && description.isNotEmpty() -> "$title - $description"
+            else -> ""
         }
-        return ""
     }
 
-    private fun displaySnackbar(view: View,string: String){
-        Snackbar.make(view,string,Snackbar.LENGTH_SHORT).show()
-        val bundle = Bundle()
-        bundle.putString(Constant.SNACK_BAR_STRING,string)
-        firebaseAnalytics.logEvent(Constant.DISPLAY_SNACK_BAR,bundle)
+    private fun displaySnackbar(view: View, string: String) {
+        Snackbar.make(view, string, Snackbar.LENGTH_SHORT).show()
     }
-
-
-
 }
+
