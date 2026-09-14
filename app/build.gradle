@@ -3,11 +3,11 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    namespace "com.himanshurawat.notes"
+    namespace "com.himanshurawat.notesapp"
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.himanshurawat.notes"
+        applicationId "com.himanshurawat.notesapp"
         minSdk 23
         targetSdk 34
         versionCode 6
@@ -15,8 +15,24 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        release {
+            def keystorePath = System.getenv("KEYSTORE_FILE")
+            if (keystorePath != null && file(keystorePath).exists()) {
+                storeFile file(keystorePath)
+                storePassword System.getenv("KEYSTORE_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS")
+                keyPassword System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            def keystorePath = System.getenv("KEYSTORE_FILE")
+            if (keystorePath != null && file(keystorePath).exists()) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
