@@ -4,12 +4,12 @@ apply plugin: 'kotlin-kapt'
 
 android {
     namespace "com.himanshurawat.notesapp"
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.himanshurawat.notesapp"
         minSdk 23
-        targetSdk 34
+        targetSdk 36
         versionCode 6
         versionName "2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
