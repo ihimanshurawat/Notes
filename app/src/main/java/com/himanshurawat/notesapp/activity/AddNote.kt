@@ -355,10 +355,28 @@ class AddNote : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimePic
             getPendingIntentFlags()
         )
         val triggerTime = getNotificationTime(yy, mm, dd, hh, mn)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
-        } else {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (alarmManager.canScheduleExactAlarms()) {
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+                } else {
+                    alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+                }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            } else {
+                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            }
+        } catch (e: SecurityException) {
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+                } else {
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+                }
+            } catch (e2: Exception) {
+                // Safeguard against any unexpected exception
+            }
         }
     }
 

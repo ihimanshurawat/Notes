@@ -46,18 +46,52 @@ class RebootReceiver : BroadcastReceiver() {
                             flags
                         )
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            alarmManager.setExactAndAllowWhileIdle(
-                                AlarmManager.RTC_WAKEUP,
-                                note.notification,
-                                notePendingIntent
-                            )
-                        } else {
-                            alarmManager.set(
-                                AlarmManager.RTC_WAKEUP,
-                                note.notification,
-                                notePendingIntent
-                            )
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                if (alarmManager.canScheduleExactAlarms()) {
+                                    alarmManager.setExactAndAllowWhileIdle(
+                                        AlarmManager.RTC_WAKEUP,
+                                        note.notification,
+                                        notePendingIntent
+                                    )
+                                } else {
+                                    alarmManager.setAndAllowWhileIdle(
+                                        AlarmManager.RTC_WAKEUP,
+                                        note.notification,
+                                        notePendingIntent
+                                    )
+                                }
+                            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                alarmManager.setExactAndAllowWhileIdle(
+                                    AlarmManager.RTC_WAKEUP,
+                                    note.notification,
+                                    notePendingIntent
+                                )
+                            } else {
+                                alarmManager.set(
+                                    AlarmManager.RTC_WAKEUP,
+                                    note.notification,
+                                    notePendingIntent
+                                )
+                            }
+                        } catch (e: SecurityException) {
+                            try {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    alarmManager.setAndAllowWhileIdle(
+                                        AlarmManager.RTC_WAKEUP,
+                                        note.notification,
+                                        notePendingIntent
+                                    )
+                                } else {
+                                    alarmManager.set(
+                                        AlarmManager.RTC_WAKEUP,
+                                        note.notification,
+                                        notePendingIntent
+                                    )
+                                }
+                            } catch (e2: Exception) {
+                                // Safeguard against any unexpected exception
+                            }
                         }
                     }
                 }

@@ -72,7 +72,11 @@ class NotificationReceiver : BroadcastReceiver() {
                     notificationBuilder.setContentIntent(pendingIntent)
                     notificationBuilder.setAutoCancel(true)
                     val notification: Notification = notificationBuilder.build()
-                    notificationManager.notify(noteId.toInt(), notification)
+                    try {
+                        notificationManager.notify(noteId.toInt(), notification)
+                    } catch (e: SecurityException) {
+                        // Prevent crash if POST_NOTIFICATIONS permission was revoked
+                    }
                 }
             } finally {
                 pendingResult.finish()
