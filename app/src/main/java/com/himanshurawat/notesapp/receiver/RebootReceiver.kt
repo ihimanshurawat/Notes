@@ -6,8 +6,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.himanshurawat.notesapp.db.NoteDatabase
-import com.himanshurawat.notesapp.utils.Constant
+import com.himanshurawat.notesapp.data.database.NoteDatabase
+import com.himanshurawat.notesapp.util.Constant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -101,4 +101,3 @@ class RebootReceiver : BroadcastReceiver() {
         }
     }
 }
-

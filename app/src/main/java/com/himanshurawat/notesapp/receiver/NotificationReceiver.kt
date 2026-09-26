@@ -11,10 +11,10 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.himanshurawat.notesapp.R
-import com.himanshurawat.notesapp.activity.AddNote
-import com.himanshurawat.notesapp.db.NoteDatabase
-import com.himanshurawat.notesapp.db.dao.NoteDao
-import com.himanshurawat.notesapp.utils.Constant
+import com.himanshurawat.notesapp.data.database.NoteDatabase
+import com.himanshurawat.notesapp.data.database.dao.NoteDao
+import com.himanshurawat.notesapp.ui.add.AddNote
+import com.himanshurawat.notesapp.util.Constant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -84,4 +84,3 @@ class NotificationReceiver : BroadcastReceiver() {
         }
     }
 }
-

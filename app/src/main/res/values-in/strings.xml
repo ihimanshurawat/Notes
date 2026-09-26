@@ -25,4 +25,8 @@
     <string name="notification_permission_continue">Lanjutkan</string>
     <string name="notification_permission_not_now">Nanti Saja</string>
     <string name="notification_permission_denied">Pemberitahuan dinonaktifkan. Peringatan pengingat tidak akan muncul.</string>
+    <string name="add_note">Tambah Catatan</string>
+    <string name="no_notes_yet">Belum ada catatan</string>
+    <string name="tap_to_add_note">Ketuk + untuk membuat catatan</string>
+    <string name="no_matching_notes">Tidak ada catatan yang cocok</string>
 </resources>

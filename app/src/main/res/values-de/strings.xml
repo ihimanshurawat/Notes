@@ -24,4 +24,8 @@
     <string name="notification_permission_continue">Weiter</string>
     <string name="notification_permission_not_now">Nicht jetzt</string>
     <string name="notification_permission_denied">Benachrichtigungen sind deaktiviert. Erinnerungsbenachrichtigungen werden nicht angezeigt.</string>
+    <string name="add_note">Notiz hinzufügen</string>
+    <string name="no_notes_yet">Noch keine Notizen</string>
+    <string name="tap_to_add_note">Tippe auf +, um eine Notiz zu erstellen</string>
+    <string name="no_matching_notes">Keine passenden Notizen gefunden</string>
 </resources>

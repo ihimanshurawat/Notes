@@ -24,4 +24,8 @@
     <string name="notification_permission_continue">Continuer</string>
     <string name="notification_permission_not_now">Pas maintenant</string>
     <string name="notification_permission_denied">Les notifications sont désactivées. Les alertes de rappel n\'apparaîtront pas.</string>
+    <string name="add_note">Ajouter une note</string>
+    <string name="no_notes_yet">Aucune note pour le moment</string>
+    <string name="tap_to_add_note">Appuyez sur + pour créer une note</string>
+    <string name="no_matching_notes">Aucune note correspondante trouvée</string>
 </resources>

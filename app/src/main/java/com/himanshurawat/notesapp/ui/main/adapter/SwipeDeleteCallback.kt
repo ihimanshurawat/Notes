@@ -1,77 +1,83 @@
-package com.himanshurawat.notesapp.adapter
+package com.himanshurawat.notesapp.ui.main.adapter
 
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.himanshurawat.notesapp.R
 
-
-
-class SwipeDeleteCallback(private val adapter: NoteItemAdapter):
-        ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT) {
+class SwipeDeleteCallback(private val adapter: NoteItemAdapter) :
+    ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
     private val icon = ContextCompat.getDrawable(adapter.context, R.drawable.delete_icon)
     private val background = ColorDrawable(Color.RED)
 
-
-
-
-    override fun onMove(p0: RecyclerView, p1: RecyclerView.ViewHolder, p2: RecyclerView.ViewHolder): Boolean {
+    override fun onMove(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        target: RecyclerView.ViewHolder
+    ): Boolean {
         return false
     }
 
-    override fun onSwiped(viewholder: RecyclerView.ViewHolder, p1: Int) {
-        val position = viewholder.bindingAdapterPosition
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        val position = viewHolder.bindingAdapterPosition
         if (position != RecyclerView.NO_POSITION) {
             adapter.deleteItem(position)
         }
     }
 
-    override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+    override fun onChildDraw(
+        c: Canvas,
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        dX: Float,
+        dY: Float,
+        actionState: Int,
+        isCurrentlyActive: Boolean
+    ) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         val itemView = viewHolder.itemView
         val backgroundCornerOffset = 20
 
-        if(icon != null){
+        if (icon != null) {
             val iconMargin = (itemView.height - icon.intrinsicHeight) / 2
             val iconTop = itemView.top + (itemView.height - icon.intrinsicHeight) / 2
             val iconBottom = iconTop + icon.intrinsicHeight
 
-            if (dX > 0) { // Swiping to the right
+            if (dX > 0) { // Swiping right
                 val iconLeft = itemView.left + iconMargin + icon.intrinsicWidth
                 val iconRight = itemView.left + iconMargin
                 icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
 
-                background.setBounds(itemView.left, itemView.top,
-                        itemView.left + dX.toInt() + backgroundCornerOffset,
-                        itemView.bottom)
-               // background.setBounds(0,0,0,0)
+                background.setBounds(
+                    itemView.left,
+                    itemView.top,
+                    itemView.left + dX.toInt() + backgroundCornerOffset,
+                    itemView.bottom
+                )
                 background.draw(c)
                 icon.draw(c)
-
-            } else if (dX < 0) { // Swiping to the left
+            } else if (dX < 0) { // Swiping left
                 val iconLeft = itemView.right - iconMargin - icon.intrinsicWidth
                 val iconRight = itemView.right - iconMargin
                 icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
 
-                background.setBounds(itemView.right + dX.toInt() - backgroundCornerOffset,
-                        itemView.top, itemView.right, itemView.bottom)
+                background.setBounds(
+                    itemView.right + dX.toInt() - backgroundCornerOffset,
+                    itemView.top,
+                    itemView.right,
+                    itemView.bottom
+                )
                 background.draw(c)
                 icon.draw(c)
-
-
-            } else { // view is unSwiped
+            } else { // View is unswiped
                 background.setBounds(0, 0, 0, 0)
                 background.draw(c)
                 icon.draw(c)
             }
-
         }
     }
-
-
 }

@@ -1,70 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp">
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/note_item_view_title_text_view"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Heading"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/colorTitle"
             android:textSize="18sp"
-            android:maxLines="1"
-            android:minLines="1"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Note Title" />
 
         <TextView
             android:id="@+id/note_item_view_description_text_view"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:alpha="0.7"
+            android:layout_marginTop="4dp"
+            android:alpha="0.75"
             android:ellipsize="end"
-            android:maxLines="1"
-            android:minLines="1"
-            android:text="this is some content that we will add"
+            android:maxLines="2"
             android:textColor="@color/colorDescription"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/note_item_view_title_text_view" />
+            app:layout_constraintTop_toBottomOf="@+id/note_item_view_title_text_view"
+            tools:text="This is sample note description content." />
 
         <TextView
             android:id="@+id/note_item_view_date_text_view"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
             android:maxLines="1"
-            android:text="Sunday, 13 May 2018"
             android:textColor="@color/colorDate"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/note_item_view_clock_image_view"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/note_item_view_description_text_view" />
-
+            app:layout_constraintTop_toBottomOf="@+id/note_item_view_description_text_view"
+            tools:text="Sunday, 13 May 2024" />
 
         <ImageView
             android:id="@+id/note_item_view_clock_image_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="4dp"
+            android:contentDescription="@null"
             android:src="@drawable/chip_notification"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="@+id/note_item_view_notification_text_view"
@@ -75,15 +80,14 @@
             android:id="@+id/note_item_view_notification_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="16dp"
-            android:visibility="invisible"
             android:maxLines="1"
-            android:text="2 July, 06:30 AM"
+            android:textColor="@color/colorDate"
             android:textSize="12sp"
+            android:visibility="invisible"
+            app:layout_constraintBaseline_toBaselineOf="@+id/note_item_view_date_text_view"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/note_item_view_description_text_view" />
+            tools:text="2 July, 06:30 AM" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

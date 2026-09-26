@@ -25,4 +25,8 @@
     <string name="notification_permission_continue">続行</string>
     <string name="notification_permission_not_now">後で</string>
     <string name="notification_permission_denied">通知が無効になっています。リマインダー通知は表示されません。</string>
+    <string name="add_note">メモを追加</string>
+    <string name="no_notes_yet">メモはまだありません</string>
+    <string name="tap_to_add_note">＋をタップしてメモを作成</string>
+    <string name="no_matching_notes">一致するメモが見つかりません</string>
 </resources>

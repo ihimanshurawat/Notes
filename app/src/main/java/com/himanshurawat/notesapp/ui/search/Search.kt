@@ -1,19 +1,20 @@
-package com.himanshurawat.notesapp.activity
+package com.himanshurawat.notesapp.ui.search
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.himanshurawat.notesapp.R
-import com.himanshurawat.notesapp.adapter.SearchItemAdapter
 import com.himanshurawat.notesapp.databinding.ActivitySearchBinding
-import com.himanshurawat.notesapp.utils.Constant
-import com.himanshurawat.notesapp.viewmodel.SearchViewModel
+import com.himanshurawat.notesapp.ui.add.AddNote
+import com.himanshurawat.notesapp.ui.search.adapter.SearchItemAdapter
+import com.himanshurawat.notesapp.util.Constant
 
 class Search : AppCompatActivity(), SearchView.OnQueryTextListener, SearchItemAdapter.OnSearchItemClickListener {
 
@@ -22,8 +23,9 @@ class Search : AppCompatActivity(), SearchView.OnQueryTextListener, SearchItemAd
     private lateinit var searchViewModel: SearchViewModel
 
     override fun onItemClick(id: Long) {
-        val intent = Intent(this, AddNote::class.java)
-        intent.putExtra(Constant.GET_NOTES, id)
+        val intent = Intent(this, AddNote::class.java).apply {
+            putExtra(Constant.GET_NOTES, id)
+        }
         startActivity(intent)
         finish()
     }
@@ -40,18 +42,22 @@ class Search : AppCompatActivity(), SearchView.OnQueryTextListener, SearchItemAd
             title = ""
         }
 
-        adapter = SearchItemAdapter(this, arrayListOf(), this)
+        adapter = SearchItemAdapter(this, arrayListOf(), this).apply {
+            onFilterResultListener = { count, query ->
+                if (query.isNotEmpty() && count == 0) {
+                    binding.contentSearchLayout.contentSearchEmptyTextView.visibility = View.VISIBLE
+                } else {
+                    binding.contentSearchLayout.contentSearchEmptyTextView.visibility = View.GONE
+                }
+            }
+        }
 
-        // Setting Up Recycler View
-        binding.contentSearchLayout.contentSearchRecyclerView.adapter = adapter
-        binding.contentSearchLayout.contentSearchRecyclerView.layoutManager = LinearLayoutManager(
-            this,
-            LinearLayoutManager.VERTICAL,
-            false
-        )
+        binding.contentSearchLayout.contentSearchRecyclerView.apply {
+            adapter = this@Search.adapter
+            layoutManager = LinearLayoutManager(this@Search, LinearLayoutManager.VERTICAL, false)
+        }
 
         searchViewModel = ViewModelProvider(this)[SearchViewModel::class.java]
-
         searchViewModel.getAllNotes().observe(this, Observer { notes ->
             if (notes != null) {
                 adapter.addSearchList(notes)
@@ -87,10 +93,7 @@ class Search : AppCompatActivity(), SearchView.OnQueryTextListener, SearchItemAd
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        if (newText != null) {
-            adapter.filterSearch(newText)
-        }
+        adapter.filterSearch(newText ?: "")
         return true
     }
 }
-

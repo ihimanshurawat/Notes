@@ -24,4 +24,8 @@
     <string name="notification_permission_continue">متابعة</string>
     <string name="notification_permission_not_now">ليس الآن</string>
     <string name="notification_permission_denied">الإشعارات معطلة. لن تظهر تنبيهات التذكير.</string>
+    <string name="add_note">إضافة ملاحظة</string>
+    <string name="no_notes_yet">لا توجد ملاحظات بعد</string>
+    <string name="tap_to_add_note">اضغط على + لإنشاء ملاحظة</string>
+    <string name="no_matching_notes">لم يتم العثور على ملاحظات مطابقة</string>
 </resources>

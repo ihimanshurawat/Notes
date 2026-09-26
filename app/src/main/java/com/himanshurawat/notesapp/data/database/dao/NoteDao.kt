@@ -1,9 +1,13 @@
-package com.himanshurawat.notesapp.db.dao
+package com.himanshurawat.notesapp.data.database.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
-
-import com.himanshurawat.notesapp.db.entity.NoteEntity
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.himanshurawat.notesapp.data.database.entity.NoteEntity
 
 @Dao
 interface NoteDao {
